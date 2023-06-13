@@ -1,6 +1,15 @@
 import peewee
 
-db = peewee.SqliteDatabase(":memory:")
+from config import config
+
+if config.get("in_memory", False):
+    db_url = ":memory:"
+    print("using in-memory database")
+else:
+    db_url = config.get("database_file", "database.db")
+    print(f"using database file: {db_url}")
+
+db = peewee.SqliteDatabase(db_url)
 
 
 class BaseModel(peewee.Model):
