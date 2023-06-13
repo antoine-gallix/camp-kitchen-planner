@@ -8,6 +8,8 @@ packages = [{include = "camp_kitchen_planner"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+peewee = "^3.16.2"
+prettytable = "^3.8.0"
 
 
 [build-system]
