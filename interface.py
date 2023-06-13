@@ -1,15 +1,7 @@
 from prettytable import PrettyTable
 
 import dialog
-from models import Ingredient, Item, Recipe
-
-
-def choose_or_create_ingredient():
-    ingredients = list(Ingredient.select())
-    ingredient = dialog.choose(["create ingredient"] + ingredients)
-    if ingredient == "create ingredient":
-        ingredient = create_ingredient_dialog()
-    return ingredient
+import models
 
 
 def view_instances(model):
@@ -20,16 +12,27 @@ def view_instances(model):
     print(table)
 
 
+# ------------------------- ingredients -------------------------
+
+
 def ingredient_exists(name):
-    return Ingredient.get_or_none(Ingredient.name == name) is not None
+    return models.Ingredient.get_or_none(models.Ingredient.name == name) is not None
 
 
 def create_ingredient_dialog():
     name = input("ingredient name: ")
     if not ingredient_exists(name):
-        return Ingredient.create(name=name)
+        return models.Ingredient.create(name=name)
     else:
         print(f"{name!r} already exists")
+
+
+def choose_or_create_ingredient():
+    ingredients = list(models.Ingredient.select())
+    ingredient = dialog.choose(["create ingredient"] + ingredients)
+    if ingredient == "create ingredient":
+        ingredient = create_ingredient_dialog()
+    return ingredient
 
 
 def create_ingredients():
@@ -43,8 +46,38 @@ def create_ingredients():
         print()
 
 
+# ------------------------- recipes -------------------------
+
+
+def recipe_exists(name):
+    return models.Recipe.get_or_none(models.Recipe.name == name) is not None
+
+
 def view_recipes():
     print("-- Recipes --")
     for recipe in models.Recipe.select():
         print(recipe.description)
         print()
+
+
+def create_recipe():
+    print("recipe creation")
+    recipe = None
+    while recipe is None:
+        recipe_name = input("name: ")
+        if recipe_exists(recipe_name):
+            print("recipe with this name already exists")
+        else:
+            recipe = models.Recipe.create(name=recipe_name)
+
+    continue_ = True
+    while continue_:
+        try:
+            print("choose an ingredient")
+            ingredient = choose_or_create_ingredient()
+            quantity = input("which quantity?: ")
+            models.Item.create(recipe=recipe, ingredient=ingredient, quantity=quantity)
+        except EOFError:
+            continue_ = False
+    print("recipe created")
+    print(recipe.description)
