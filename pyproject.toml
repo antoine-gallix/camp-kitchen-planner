@@ -10,6 +10,8 @@ packages = [{include = "camp_kitchen_planner"}]
 python = "^3.11"
 peewee = "^3.16.2"
 prettytable = "^3.8.0"
+dynaconf = "^3.1.12"
+loguru = "^0.7.0"
 
 
 [build-system]
