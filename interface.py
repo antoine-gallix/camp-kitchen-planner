@@ -41,3 +41,10 @@ def create_ingredients():
         except EOFError:
             continue_ = False
         print()
+
+
+def view_recipes():
+    print("-- Recipes --")
+    for recipe in models.Recipe.select():
+        print(recipe.description)
+        print()
