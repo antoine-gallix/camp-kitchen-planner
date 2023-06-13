@@ -39,3 +39,7 @@ class Item(BaseModel):
     recipe = peewee.ForeignKeyField(Recipe, backref="items")
     ingredient = peewee.ForeignKeyField(Ingredient)
     quantity = peewee.IntegerField()
+
+
+def create_tables():
+    db.create_tables([Ingredient, Recipe, Item])
