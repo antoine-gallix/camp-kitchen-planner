@@ -1,6 +1,15 @@
 from prettytable import PrettyTable
 
+import dialog
 from models import Ingredient, Item, Recipe
+
+
+def choose_or_create_ingredient():
+    ingredients = list(Ingredient.select())
+    ingredient = dialog.choose(["create ingredient"] + ingredients)
+    if ingredient == "create ingredient":
+        ingredient = create_ingredient_dialog()
+    return ingredient
 
 
 def view_instances(model):
@@ -18,7 +27,7 @@ def ingredient_exists(name):
 def create_ingredient_dialog():
     name = input("ingredient name: ")
     if not ingredient_exists(name):
-        Ingredient.create(name=name)
+        return Ingredient.create(name=name)
     else:
         print(f"{name!r} already exists")
 
