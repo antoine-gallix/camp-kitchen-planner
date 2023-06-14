@@ -46,6 +46,10 @@ def create_ingredients():
         print()
 
 
+def view_ingredients():
+    view_instances(models.Ingredient)
+
+
 # ------------------------- recipes -------------------------
 
 
