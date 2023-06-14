@@ -19,10 +19,10 @@ class BaseModel(peewee.Model):
 
 class Ingredient(BaseModel):
     name = peewee.CharField(unique=True)
-    unit = peewee.CharField(unique=True, default=None)
+    unit = peewee.CharField(default="unit")
 
     def __str__(self):
-        return str(self.name)
+        return f"{self.name}({self.unit})"
 
     def __repr__(self):
         return f"<Ingredient({self})>"
@@ -41,7 +41,9 @@ class Recipe(BaseModel):
     def description(self):
         description_ = [str(self)]
         for item in getattr(self, "items"):
-            description_.append(f"- {item.quantity} x {item.ingredient.name}")
+            description_.append(
+                f"- {item.quantity} {item.ingredient.unit} {item.ingredient.name}"
+            )
         return "\n".join(description_)
 
 
