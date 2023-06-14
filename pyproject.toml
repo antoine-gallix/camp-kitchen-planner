@@ -13,6 +13,7 @@ prettytable = "^3.8.0"
 dynaconf = "^3.1.12"
 loguru = "^0.7.0"
 python-statemachine = "^2.1.0"
+textual = {extras = ["dev"], version = "^0.27.0"}
 
 
 [build-system]
