@@ -19,6 +19,7 @@ class BaseModel(peewee.Model):
 
 class Ingredient(BaseModel):
     name = peewee.CharField(unique=True)
+    unit = peewee.CharField(unique=True, default=None)
 
     def __str__(self):
         return str(self.name)
@@ -50,5 +51,15 @@ class Item(BaseModel):
     quantity = peewee.IntegerField()
 
 
+all_models = [Ingredient, Recipe, Item]
+
+
 def create_tables():
-    db.create_tables([Ingredient, Recipe, Item])
+    print("creating tables")
+    db.create_tables(all_models)
+
+
+def reset_tables():
+    print("reseting tables")
+    db.drop_tables(all_models)
+    db.create_tables(all_models)
