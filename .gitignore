@@ -162,4 +162,5 @@ cython_debug/
 # ---------------- personal -----------------
 
 dev.py
+dev_*.py
 *.db
