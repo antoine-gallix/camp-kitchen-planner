@@ -7,11 +7,12 @@ readme = "README.md"
 packages = [{include = "camp_kitchen_planner"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.12"
 peewee = "^3.16.2"
 prettytable = "^3.8.0"
 dynaconf = "^3.1.12"
 loguru = "^0.7.0"
+python-statemachine = "^2.1.0"
 
 
 [build-system]

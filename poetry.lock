@@ -83,6 +83,18 @@ wcwidth = "*"
 tests = ["pytest", "pytest-cov", "pytest-lazy-fixture"]
 
 [[package]]
+name = "python-statemachine"
+version = "2.1.0"
+description = "Python Finite State Machines made easy."
+category = "main"
+optional = false
+python-versions = ">=3.7,<3.12"
+files = [
+    {file = "python_statemachine-2.1.0-py3-none-any.whl", hash = "sha256:195d8a1059ea22e94effce35d5fd9352362391e07ed248e04e27fadb49b41726"},
+    {file = "python_statemachine-2.1.0.tar.gz", hash = "sha256:aded5878526f5249465ce5aec3fb8babc9e08261bba4a4e0d147403e73335c34"},
+]
+
+[[package]]
 name = "wcwidth"
 version = "0.2.6"
 description = "Measures the displayed width of unicode strings in a terminal"
@@ -111,5 +123,5 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.11"
-content-hash = "47ce6ec3bed04c8097390cd041353a761f8e5aaa9d22ff3db90c30ce4f84b633"
+python-versions = ">=3.11,<3.12"
+content-hash = "db835c3e22d8ac5f156d6fe48179833de073041ed493e2cd94b41b34b14d14c6"
