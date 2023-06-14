@@ -16,3 +16,9 @@ def choose(choices, display=str):
         except IndexError:
             print("index out of range")
     return chosen_item
+
+
+def choose_action(choices):
+    print("choose an action:")
+    key = choose(list(choices.keys()))
+    choices[key]()
