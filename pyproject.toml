@@ -14,6 +14,8 @@ dynaconf = "^3.1.12"
 loguru = "^0.7.0"
 python-statemachine = "^2.1.0"
 textual = {extras = ["dev"], version = "^0.27.0"}
+pyyaml = "^6.0"
+funcy = "^2.0"
 
 
 [build-system]
