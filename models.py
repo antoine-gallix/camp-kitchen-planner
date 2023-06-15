@@ -30,6 +30,7 @@ class Ingredient(BaseModel):
 
 class Recipe(BaseModel):
     name = peewee.CharField(unique=True)
+    serves = peewee.IntegerField()
 
     def __str__(self):
         return str(self.name)
