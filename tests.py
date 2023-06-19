@@ -41,3 +41,9 @@ def test__parse_item_line__parenthesis():
     assert loader.parse_item_line("12g ganja (well dried)") == loader.ItemData(
         name="ganja", number=12, unit="g"
     )
+
+
+def test__parse_item_line__units():
+    assert loader.parse_item_line("2kg rice") == loader.ItemData(
+        name="rice", number=2, unit="kg"
+    )

@@ -22,7 +22,7 @@ def parse_item_line(line):
 
     # regexes
     UNIT_SYMBOLS = ["g", "kg", "L", "l", "ml", "cl", "tsp", "tbsp"]
-    UNIT_SYMBOL_REGEX = f"[{'|'.join(UNIT_SYMBOLS)}]"
+    UNIT_SYMBOL_REGEX = f"({'|'.join(UNIT_SYMBOLS)})"
     QUANTITY_REGEX = r"\d+" + r"\s?" + f"{UNIT_SYMBOL_REGEX}?"
     PARENTHESIS_REGEX = r"\((.*)\)"
 
@@ -45,7 +45,6 @@ def parse_item_line(line):
         ingredient = rest[: res.start()].strip()
     else:
         ingredient = rest
-
     return ItemData(name=ingredient, number=int(number), unit=unit)
 
 
