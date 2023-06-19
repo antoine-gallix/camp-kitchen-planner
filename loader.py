@@ -15,6 +15,9 @@ class ItemData:
 
 
 def parse_item_line(line):
+    line = line.lower()
+    line = re.sub(r"\s+", " ", line)  # conpact spaces
+    line = line.strip()  # remove border spaces
     quantity, name = line.split()
     number, unit = re.match(r"(\d+)\s*(\w*)", quantity).groups()
     unit = unit or None
