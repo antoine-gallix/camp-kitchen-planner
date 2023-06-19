@@ -22,3 +22,9 @@ pytest = "^7.3.2"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+	# filter out something from pip intertals that emmit a warning
+    "ignore:pkg_resources is deprecated as an API",
+]
