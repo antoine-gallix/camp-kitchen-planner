@@ -15,13 +15,38 @@ class ItemData:
 
 
 def parse_item_line(line):
+    # pre-process
     line = line.lower()
     line = re.sub(r"\s+", " ", line)  # conpact spaces
     line = line.strip()  # remove border spaces
-    quantity, name = line.split()
-    number, unit = re.match(r"(\d+)\s*(\w*)", quantity).groups()
-    unit = unit or None
-    return ItemData(name=name, number=int(number), unit=unit)
+
+    # regexes
+    UNIT_SYMBOLS = ["g", "kg", "L", "l", "ml", "cl", "tsp", "tbsp"]
+    UNIT_SYMBOL_REGEX = f"[{'|'.join(UNIT_SYMBOLS)}]"
+    QUANTITY_REGEX = r"\d+" + r"\s?" + f"{UNIT_SYMBOL_REGEX}?"
+    PARENTHESIS_REGEX = r"\((.*)\)"
+
+    # extract quantity
+    res = re.search(QUANTITY_REGEX, line)
+    if res is not None:
+        quantity = res.group()
+        rest = line[res.end() :].strip()
+    else:
+        raise Exception(f"quantity string not found in {line!r}")
+
+    # extract number
+    res = re.search(r"\d+", quantity)
+    number = res.group()
+    unit = quantity[res.end() :].strip() or None
+
+    # extract parenthesis
+    res = re.search(PARENTHESIS_REGEX, rest)
+    if res is not None:
+        ingredient = rest[: res.start()].strip()
+    else:
+        ingredient = rest
+
+    return ItemData(name=ingredient, number=int(number), unit=unit)
 
 
 @dataclass
