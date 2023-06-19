@@ -16,8 +16,9 @@ class ItemData:
 
 def parse_item_line(line):
     quantity, name = line.split()
-    number, unit = re.match("(\d+)(\w*)", line).groups()
-    return ItemData(name=name, number=number, unit=unit)
+    number, unit = re.match(r"(\d+)\s*(\w*)", quantity).groups()
+    unit = unit or None
+    return ItemData(name=name, number=int(number), unit=unit)
 
 
 @dataclass
