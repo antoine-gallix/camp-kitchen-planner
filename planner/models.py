@@ -20,24 +20,16 @@ class BaseModel(peewee.Model):
         database = db
 
 
-class WeightUnit(Enum):
-    g = auto()
-    kg = auto()
-
-
-class VolumeUnit(Enum):
-    ml = auto()
-    cl = auto()
-    dl = auto()
-    l = auto()
-
-
 class Ingredient(BaseModel):
     name = peewee.CharField(unique=True)
-    type = peewee.CharField()
+    unit = peewee.CharField()
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def exists(cls, name):
+        return cls.get_or_none(cls.name == name) is not None
 
 
 class Recipe(BaseModel):
@@ -65,6 +57,12 @@ class Item(BaseModel):
     recipe = peewee.ForeignKeyField(Recipe, backref="items")
     ingredient = peewee.ForeignKeyField(Ingredient)
     quantity = peewee.IntegerField()
+
+    def __repr__(self):
+        return f"Item({self.quantity},{self.ingredient})"
+
+    def __str__(self):
+        return f"{self.quantity} {self.ingredient.name}"
 
     @staticmethod
     def parse_item_line(line):
@@ -100,9 +98,37 @@ class Item(BaseModel):
             ingredient = rest
         return ingredient, int(number), unit
 
+    @staticmethod
+    def normalize(number, unit):
+        print("normalizing")
+        unit_map = {
+            "mg": ("g", 1 / 1000),
+            "g": ("g", 1),
+            "kg": ("g", 1000),
+            "ml": ("l", 1 / 1000),
+            "cl": ("l", 1 / 100),
+            "dl": ("l", 1 / 10),
+            "l": ("l", 1),
+            None: ("unit", 1),
+            "": ("unit", 1),
+        }
+        unit, scale = unit_map[unit]
+        number = number * scale
+        return number, unit
+
     @classmethod
-    def from_string(cls, item_string):
-        return cls.__init__()
+    def create_item_from_line(cls, line, recipe):
+        name, number, unit = cls.parse_item_line(line)
+
+        number, unit = cls.normalize(number, unit)
+        ingredient, created = Ingredient.get_or_create(name=name, unit=unit)
+        if created:
+            print(f"Ingredient has been created")
+        else:
+            print(f"Ingredient already exist")
+        item = cls.create(ingredient=ingredient, quantity=number, recipe=recipe)
+        print(f"created item: {item}")
+        return item
 
 
 all_models = [Ingredient, Recipe, Item]
