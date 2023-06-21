@@ -3,8 +3,14 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
+from icecream import ic
 
-import models
+from planner import models
+
+
+def load_yaml_file(file_path):
+    file_content = Path(file_path).read_text()
+    return list(yaml.load_all(file_content, yaml.SafeLoader))
 
 
 @dataclass
@@ -56,19 +62,28 @@ class RecipeFileData:
 
 
 def parse_recipe_file(recipe_file_path):
-    file_content = Path(recipe_file_path).read_text()
-    header, items, instructions = yaml.load_all(file_content, yaml.SafeLoader)
+    header, items, instructions = load_yaml_file(recipe_file_path)
     return RecipeFileData(header=header, items=items, instructions=instructions)
 
 
 def load_recipe_file(path):
+    print(f"reading recipe from {path}")
     file_data = parse_recipe_file(path)
     items_data = (parse_item_line(line) for line in file_data.items)
 
     models.create_tables()
     recipe = models.Recipe.create(**file_data.header)
     for item_data in items_data:
-        ingredient = models.Ingredient.create(name=item_data.name, unit=item_data.unit)
+        kwargs = {"name": item_data.name}
+        if item_data.unit is not None:
+            kwargs["unit"] = item_data.unit
+        ingredient, _ = models.Ingredient.get_or_create(**kwargs)
         models.Item.create(
             ingredient=ingredient, quantity=item_data.number, recipe=recipe
         )
+
+
+def load_recipe_dir(path):
+    print(f"loading recipes in {path}")
+    for recipe_file in Path(path).iterdir():
+        load_recipe_file(recipe_file)
