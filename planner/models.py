@@ -56,7 +56,7 @@ class Recipe(BaseModel):
 class Item(BaseModel):
     recipe = peewee.ForeignKeyField(Recipe, backref="items")
     ingredient = peewee.ForeignKeyField(Ingredient)
-    quantity = peewee.IntegerField()
+    quantity = peewee.FloatField()
 
     def __repr__(self):
         return f"Item({self.quantity},{self.ingredient})"
