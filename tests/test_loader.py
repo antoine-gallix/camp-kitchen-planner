@@ -1,3 +1,5 @@
+from pytest import raises
+
 from planner import models
 
 
@@ -35,3 +37,12 @@ def test__parse_item_line__units():
 
 def test__parse_item_line__float():
     assert models.Item.parse_item_line("2.5kg rice") == ("rice", 2.5, "kg")
+
+
+def test__parse_item_line__number_zero():
+    with raises(Exception):
+        models.Item.parse_item_line("0 apple")
+
+
+def test__parse_item_line__ingredient_starts_with_l():
+    assert models.Item.parse_item_line("1 lemon") == ("lemon", 1, None)
