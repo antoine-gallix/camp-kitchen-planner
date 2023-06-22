@@ -1,4 +1,5 @@
-from pytest import fixture
+import peewee
+from pytest import fixture, raises
 
 from planner import models
 
@@ -38,3 +39,14 @@ def test__Item__create_from_line():
     assert item.quantity == 2000
     assert item.ingredient.name == "pommes"
     assert item.ingredient.unit == "g"
+
+
+def test__Ingredient__unique_name_unit__diff_unit():
+    models.Ingredient.create(name="pommes", unit="g")
+    models.Ingredient.create(name="pommes", unit="unit")
+
+
+def test__Ingredient__unique_name_unit__all_same():
+    models.Ingredient.create(name="pommes", unit="g")
+    with raises(peewee.IntegrityError):
+        models.Ingredient.create(name="pommes", unit="g")

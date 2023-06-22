@@ -23,8 +23,11 @@ class BaseModel(peewee.Model):
 
 
 class Ingredient(BaseModel):
-    name = peewee.CharField(unique=True)
+    name = peewee.CharField()
     unit = peewee.CharField()
+
+    class Meta:
+        indexes = [(("name", "unit"), True)]
 
     def __str__(self):
         return self.name
