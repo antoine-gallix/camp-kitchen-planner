@@ -75,7 +75,7 @@ class Item(BaseModel):
         UNIT_SYMBOLS = ["g", "kg", "L", "l", "ml", "cl", "tsp", "tbsp"]
         UNIT_SYMBOL_REGEX = f"({'|'.join(UNIT_SYMBOLS)})"
         NUMBER_REGEX = r"[\d\.]+"
-        QUANTITY_REGEX = NUMBER_REGEX + r"\s?" + f"{UNIT_SYMBOL_REGEX}?"
+        QUANTITY_REGEX = NUMBER_REGEX + r"\s?" + f"{UNIT_SYMBOL_REGEX}?" + r"(?=\s)"
         PARENTHESIS_REGEX = r"\((.*)\)"
 
         # extract quantity
