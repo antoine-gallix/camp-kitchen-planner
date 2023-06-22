@@ -17,6 +17,10 @@ else:
 db = peewee.SqliteDatabase(db_url)
 
 
+def normalize_string(string):
+    return re.sub("\s{2,}", " ", string.lower().strip())
+
+
 class BaseModel(peewee.Model):
     class Meta:
         database = db
@@ -31,7 +35,7 @@ class Ingredient(BaseModel):
 
     def __init__(self, **kwargs):
         if "name" in kwargs:
-            kwargs["name"] = kwargs["name"].lower().strip()
+            kwargs["name"] = normalize_string(kwargs["name"])
         super().__init__(**kwargs)
 
     def __str__(self):
@@ -48,7 +52,7 @@ class Recipe(BaseModel):
 
     def __init__(self, **kwargs):
         if "name" in kwargs:
-            kwargs["name"] = kwargs["name"].lower().strip()
+            kwargs["name"] = normalize_string(kwargs["name"])
         super().__init__(**kwargs)
 
     def __str__(self):

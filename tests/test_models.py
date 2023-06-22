@@ -29,6 +29,12 @@ def test__Ingredient__strip():
     assert salsifi.name == "salsifi"
 
 
+def test__Ingredient__squash():
+    salsifi = models.Ingredient(name="chili  con    carne", unit="g")
+    salsifi.save()
+    assert salsifi.name == "chili con carne"
+
+
 def test__Ingredient__repr_str():
     salsifi = models.Ingredient(name="salsifi", unit="g")
     assert repr(salsifi) == "<Ingredient: salsifi>"
@@ -54,6 +60,13 @@ def test__Recipe__create():
     pct.save()
 
 
+def test__Recipe__all_required():
+    with raises(peewee.IntegrityError):
+        models.Recipe.create(name="pan con tomate")
+    with raises(peewee.IntegrityError):
+        models.Recipe.create(serves=1000)
+
+
 def test__Recipe__lowercase():
     pct = models.Recipe(name="Pan Con Tomate", serves=1)
     pct.save()
@@ -64,6 +77,12 @@ def test__Recipe__strip():
     pct = models.Recipe(name="   pan con tomate   ", serves=1)
     pct.save()
     assert pct.name == "pan con tomate"
+
+
+def test__Recipe__squash():
+    salsifi = models.Recipe(name="chili  con    carne", serves=12)
+    salsifi.save()
+    assert salsifi.name == "chili con carne"
 
 
 def test__Recipe__repr_str():
