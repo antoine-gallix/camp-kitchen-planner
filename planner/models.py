@@ -29,6 +29,11 @@ class Ingredient(BaseModel):
     class Meta:
         indexes = [(("name", "unit"), True)]
 
+    def __init__(self, **kwargs):
+        if "name" in kwargs:
+            kwargs["name"] = kwargs["name"].lower()
+        super().__init__(**kwargs)
+
     def __str__(self):
         return self.name
 
@@ -40,6 +45,11 @@ class Ingredient(BaseModel):
 class Recipe(BaseModel):
     name = peewee.CharField(unique=True)
     serves = peewee.IntegerField()
+
+    def __init__(self, **kwargs):
+        if "name" in kwargs:
+            kwargs["name"] = kwargs["name"].lower()
+        super().__init__(**kwargs)
 
     def __str__(self):
         return str(self.name)

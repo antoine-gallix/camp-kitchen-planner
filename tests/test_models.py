@@ -9,9 +9,18 @@ def rollback_transaction_here(rollback_transaction):
     ...
 
 
+# ------------------------- Ingredient -------------------------
+
+
 def test__Ingredient__save():
     salsifi = models.Ingredient(name="salsifi", unit="g")
     salsifi.save()
+
+
+def test__Ingredient__lowercase():
+    salsifi = models.Ingredient(name="Salsifi", unit="g")
+    salsifi.save()
+    assert salsifi.name == "salsifi"
 
 
 def test__Ingredient__repr_str():
@@ -20,9 +29,29 @@ def test__Ingredient__repr_str():
     assert str(salsifi) == "salsifi"
 
 
+def test__Ingredient__unique_name_unit__diff_unit():
+    models.Ingredient.create(name="pommes", unit="g")
+    models.Ingredient.create(name="pommes", unit="unit")
+
+
+def test__Ingredient__unique_name_unit__all_same():
+    models.Ingredient.create(name="pommes", unit="g")
+    with raises(peewee.IntegrityError):
+        models.Ingredient.create(name="pommes", unit="g")
+
+
+# ------------------------- Recipe -------------------------
+
+
 def test__Recipe__create():
     pct = models.Recipe(name="pan con tomate", serves=1)
     pct.save()
+
+
+def test__Recipe__lowercase():
+    pct = models.Recipe(name="Pan Con Tomate", serves=1)
+    pct.save()
+    assert pct.name == "pan con tomate"
 
 
 def test__Recipe__repr_str():
@@ -39,14 +68,3 @@ def test__Item__create_from_line():
     assert item.quantity == 2000
     assert item.ingredient.name == "pommes"
     assert item.ingredient.unit == "g"
-
-
-def test__Ingredient__unique_name_unit__diff_unit():
-    models.Ingredient.create(name="pommes", unit="g")
-    models.Ingredient.create(name="pommes", unit="unit")
-
-
-def test__Ingredient__unique_name_unit__all_same():
-    models.Ingredient.create(name="pommes", unit="g")
-    with raises(peewee.IntegrityError):
-        models.Ingredient.create(name="pommes", unit="g")
