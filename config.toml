@@ -1,1 +1,2 @@
-in_memory = false
+in_memory = true
+logging_level = "debug"
