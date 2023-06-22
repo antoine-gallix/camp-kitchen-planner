@@ -90,6 +90,9 @@ class Item(BaseModel):
         number = float(res.group())
         unit = quantity[res.end() :].strip() or None
 
+        if number == 0:
+            raise Exception(f"parsed number is zero in line {line}")
+
         # extract parenthesis
         res = re.search(PARENTHESIS_REGEX, rest)
         if res is not None:
