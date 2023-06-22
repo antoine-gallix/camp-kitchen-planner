@@ -9,10 +9,10 @@ from planner.config import config
 
 if config.get("in_memory", False):
     db_url = ":memory:"
-    logger.info("using in-memory database")
+    logger.debug("using in-memory database")
 else:
     db_url = config.get("database_file", "database.db")
-    logger.info(f"using database file: {db_url}")
+    logger.debug(f"using database file: {db_url}")
 
 db = peewee.SqliteDatabase(db_url)
 
@@ -146,11 +146,11 @@ class Item(BaseModel):
         number, unit = cls.normalize(number, unit)
         ingredient, created = Ingredient.get_or_create(name=name, unit=unit)
         if created:
-            logger.info(f"Ingredient has been created")
+            logger.debug(f"Ingredient has been created")
         else:
-            logger.info(f"Ingredient already exist")
+            logger.debug(f"Ingredient already exist")
         item = cls.create(ingredient=ingredient, quantity=number, recipe=recipe)
-        logger.info(f"created item: {item}")
+        logger.debug(f"created item: {item}")
         return item
 
 
@@ -158,11 +158,11 @@ all_models = [Ingredient, Recipe, Item]
 
 
 def create_tables():
-    logger.info("creating tables")
+    logger.debug("creating tables")
     db.create_tables(all_models)
 
 
 def reset_tables():
-    logger.info("reseting tables")
+    logger.debug("reseting tables")
     db.drop_tables(all_models)
     db.create_tables(all_models)
