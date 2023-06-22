@@ -3,7 +3,8 @@ from enum import Enum, auto
 
 import peewee
 
-from config import config
+import planner.loader
+from planner.config import config
 
 if config.get("in_memory", False):
     db_url = ":memory:"
@@ -103,7 +104,6 @@ class Item(BaseModel):
 
     @staticmethod
     def normalize(number, unit):
-        print("normalizing")
         unit_map = {
             "mg": ("g", 1 / 1000),
             "g": ("g", 1),

@@ -1,6 +1,9 @@
+from collections import defaultdict
+
 from prettytable import PrettyTable
 
 import dialog
+import loader
 import models
 
 
@@ -15,8 +18,12 @@ def view_instances(model):
 # ------------------------- ingredients -------------------------
 
 
+def get_ingredient_by_name(name):
+    return models.Ingredient.get_or_none(models.Ingredient.name == name)
+
+
 def ingredient_exists(name):
-    return models.Ingredient.get_or_none(models.Ingredient.name == name) is not None
+    return get_ingredient_by_name is not None
 
 
 def create_ingredient_dialog():
@@ -53,8 +60,6 @@ def view_ingredients():
 # ------------------------- recipes -------------------------
 
 
-def recipe_exists(name):
-    return models.Recipe.get_or_none(models.Recipe.name == name) is not None
 
 
 def view_recipes():
