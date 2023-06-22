@@ -31,7 +31,7 @@ class Ingredient(BaseModel):
 
     def __init__(self, **kwargs):
         if "name" in kwargs:
-            kwargs["name"] = kwargs["name"].lower()
+            kwargs["name"] = kwargs["name"].lower().strip()
         super().__init__(**kwargs)
 
     def __str__(self):
@@ -48,7 +48,7 @@ class Recipe(BaseModel):
 
     def __init__(self, **kwargs):
         if "name" in kwargs:
-            kwargs["name"] = kwargs["name"].lower()
+            kwargs["name"] = kwargs["name"].lower().strip()
         super().__init__(**kwargs)
 
     def __str__(self):

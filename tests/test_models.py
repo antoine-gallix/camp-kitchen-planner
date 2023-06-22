@@ -23,6 +23,12 @@ def test__Ingredient__lowercase():
     assert salsifi.name == "salsifi"
 
 
+def test__Ingredient__strip():
+    salsifi = models.Ingredient(name="   salsifi   ", unit="g")
+    salsifi.save()
+    assert salsifi.name == "salsifi"
+
+
 def test__Ingredient__repr_str():
     salsifi = models.Ingredient(name="salsifi", unit="g")
     assert repr(salsifi) == "<Ingredient: salsifi>"
@@ -50,6 +56,12 @@ def test__Recipe__create():
 
 def test__Recipe__lowercase():
     pct = models.Recipe(name="Pan Con Tomate", serves=1)
+    pct.save()
+    assert pct.name == "pan con tomate"
+
+
+def test__Recipe__strip():
+    pct = models.Recipe(name="   pan con tomate   ", serves=1)
     pct.save()
     assert pct.name == "pan con tomate"
 
