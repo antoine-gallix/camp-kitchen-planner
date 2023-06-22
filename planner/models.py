@@ -114,6 +114,8 @@ class Item(BaseModel):
             "l": ("l", 1),
             None: ("unit", 1),
             "": ("unit", 1),
+            "tbsp": ("tbsp", 1),
+            "tsp": ("tsp", 1),
         }
         unit, scale = unit_map[unit]
         number = number * scale
