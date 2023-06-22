@@ -3,9 +3,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
-from icecream import ic
 
-from planner import models
+from planner import logger, models
 
 
 def load_yaml_file(file_path):
@@ -26,7 +25,7 @@ def parse_recipe_file(recipe_file_path):
 
 
 def load_recipe_file(path):
-    print(f"reading recipe from {path}")
+    logger.info(f"reading recipe from {path}")
     file_data = parse_recipe_file(path)
     recipe = models.Recipe.create(**file_data.header)
     for item_data in file_data.items:
@@ -40,6 +39,6 @@ def load_recipe_file(path):
 
 
 def load_recipe_dir(path):
-    print(f"loading recipes in {path}")
+    logger.info(f"loading recipes in {path}")
     for recipe_file in Path(path).iterdir():
         load_recipe_file(recipe_file)

@@ -4,14 +4,15 @@ from enum import Enum, auto
 import peewee
 
 import planner.loader
+from planner import logger
 from planner.config import config
 
 if config.get("in_memory", False):
     db_url = ":memory:"
-    print("using in-memory database")
+    logger.info("using in-memory database")
 else:
     db_url = config.get("database_file", "database.db")
-    print(f"using database file: {db_url}")
+    logger.info(f"using database file: {db_url}")
 
 db = peewee.SqliteDatabase(db_url)
 
@@ -128,11 +129,11 @@ class Item(BaseModel):
         number, unit = cls.normalize(number, unit)
         ingredient, created = Ingredient.get_or_create(name=name, unit=unit)
         if created:
-            print(f"Ingredient has been created")
+            logger.info(f"Ingredient has been created")
         else:
-            print(f"Ingredient already exist")
+            logger.info(f"Ingredient already exist")
         item = cls.create(ingredient=ingredient, quantity=number, recipe=recipe)
-        print(f"created item: {item}")
+        logger.info(f"created item: {item}")
         return item
 
 
@@ -140,11 +141,11 @@ all_models = [Ingredient, Recipe, Item]
 
 
 def create_tables():
-    print("creating tables")
+    logger.info("creating tables")
     db.create_tables(all_models)
 
 
 def reset_tables():
-    print("reseting tables")
+    logger.info("reseting tables")
     db.drop_tables(all_models)
     db.create_tables(all_models)

@@ -12,7 +12,7 @@ DEFAULT_LOGGING_LEVEL = "INFO"
 
 def add_terminal_sink():
     """Setup a free text logging sink to stdout"""
-    level = config.get("logging.level", default=DEFAULT_LOGGING_LEVEL).upper()
+    level = config.get("logging_level", default=DEFAULT_LOGGING_LEVEL).upper()
     logger.add(
         sys.stdout,
         format="<level>{message}</level>",
