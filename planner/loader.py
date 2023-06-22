@@ -9,7 +9,9 @@ from planner import logger, models
 
 def load_yaml_file(file_path):
     file_content = Path(file_path).read_text()
-    return list(yaml.load_all(file_content, yaml.SafeLoader))
+    parts = map(lambda st: st.strip(), file_content.split("\n---"))
+    data = map(lambda part: yaml.load(part, yaml.Loader), list(parts)[:2])
+    return list(data)
 
 
 @dataclass
