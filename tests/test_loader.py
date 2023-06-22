@@ -31,3 +31,7 @@ def test__parse_item_line__parenthesis():
 
 def test__parse_item_line__units():
     assert models.Item.parse_item_line("2kg rice") == ("rice", 2, "kg")
+
+
+def test__parse_item_line__float():
+    assert models.Item.parse_item_line("2.5kg rice") == ("rice", 2.5, "kg")

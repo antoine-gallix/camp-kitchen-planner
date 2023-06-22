@@ -74,7 +74,8 @@ class Item(BaseModel):
         # regexes
         UNIT_SYMBOLS = ["g", "kg", "L", "l", "ml", "cl", "tsp", "tbsp"]
         UNIT_SYMBOL_REGEX = f"({'|'.join(UNIT_SYMBOLS)})"
-        QUANTITY_REGEX = r"\d+" + r"\s?" + f"{UNIT_SYMBOL_REGEX}?"
+        NUMBER_REGEX = r"[\d\.]+"
+        QUANTITY_REGEX = NUMBER_REGEX + r"\s?" + f"{UNIT_SYMBOL_REGEX}?"
         PARENTHESIS_REGEX = r"\((.*)\)"
 
         # extract quantity
@@ -84,10 +85,9 @@ class Item(BaseModel):
             rest = line[res.end() :].strip()
         else:
             raise Exception(f"quantity string not found in {line!r}")
-
         # extract number
-        res = re.search(r"\d+", quantity)
-        number = int(res.group())
+        res = re.search(NUMBER_REGEX, quantity)
+        number = float(res.group())
         unit = quantity[res.end() :].strip() or None
 
         # extract parenthesis
@@ -96,7 +96,7 @@ class Item(BaseModel):
             ingredient = rest[: res.start()].strip()
         else:
             ingredient = rest
-        return ingredient, int(number), unit
+        return ingredient, number, unit
 
     @staticmethod
     def normalize(number, unit):
