@@ -27,17 +27,15 @@ def parse_recipe_file(recipe_file_path):
 
 
 def load_recipe_file(path):
-    logger.info(f"reading recipe from {path}")
+    print(f"reading recipe from {path!r}")
     file_data = parse_recipe_file(path)
     recipe = models.Recipe.create(**file_data.header)
-    for item_data in file_data.items:
-        kwargs = {"name": item_data.name}
-        if item_data.unit is not None:
-            kwargs["unit"] = item_data.unit
-        ingredient, _ = models.Ingredient.get_or_create(**kwargs)
-        models.Item.create(
-            ingredient=ingredient, quantity=item_data.number, recipe=recipe
-        )
+    for line in file_data.items:
+        try:
+            item = models.Item.create_item_from_line(line, recipe)
+        except:
+            print(f"could not parse item line: {line}")
+            raise
 
 
 def load_recipe_dir(path):
