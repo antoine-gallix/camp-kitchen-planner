@@ -17,7 +17,7 @@ def parse_recipe_file(file_path):
 
 
 def load_recipe_file(path):
-    logger.info(f"reading recipe from {str(path)!r}")
+    logger.debug(f"loading recipe {str(path)!r}")
     header, items = parse_recipe_file(path)
     recipe = models.Recipe.create(**header)
     for line in items:
@@ -29,6 +29,6 @@ def load_recipe_file(path):
 
 
 def load_recipe_dir(path):
-    logger.info(f"loading recipe directory {str(path)}")
+    logger.info(f"loading recipe directory: {str(path)!r}")
     for recipe_file in Path(path).iterdir():
         load_recipe_file(recipe_file)
