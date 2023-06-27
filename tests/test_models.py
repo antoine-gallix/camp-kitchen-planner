@@ -93,7 +93,7 @@ def test__Recipe__repr_str():
 
 def test__Item__create_from_line():
     recipe = models.Recipe.create(name="compote de pommes", serves=1)
-    models.Item.create_item_from_line("2kg pommes", recipe)
+    models.RecipeItem.create_item_from_line("2kg pommes", recipe)
     assert len(recipe.items) == 1
     item = recipe.items[0]
     assert item.quantity == 2000

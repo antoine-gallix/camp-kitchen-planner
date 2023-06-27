@@ -72,7 +72,7 @@ class Recipe(BaseModel):
         return cls.get_or_none(cls.name == name) is not None
 
 
-class Item(BaseModel):
+class RecipeItem(BaseModel):
     recipe = peewee.ForeignKeyField(Recipe, backref="items")
     ingredient = peewee.ForeignKeyField(Ingredient)
     quantity = peewee.FloatField()

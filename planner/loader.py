@@ -22,7 +22,7 @@ def load_recipe_file(path):
     recipe = models.Recipe.create(**header)
     for line in items:
         try:
-            item = models.Item.create_item_from_line(line, recipe)
+            item = models.RecipeItem.create_item_from_line(line, recipe)
         except:
             logger.debug(f"could not parse item line: {line}")
             raise
