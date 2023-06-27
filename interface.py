@@ -1,10 +1,10 @@
 from collections import defaultdict
 
+import loader
+import models
 from prettytable import PrettyTable
 
 import dialog
-import loader
-import models
 
 
 def view_instances(model):
@@ -60,8 +60,6 @@ def view_ingredients():
 # ------------------------- recipes -------------------------
 
 
-
-
 def view_recipes():
     print("-- Recipes --")
     for recipe in models.Recipe.select():
@@ -85,7 +83,9 @@ def create_recipe():
             print("choose an ingredient")
             ingredient = choose_or_create_ingredient()
             quantity = input("which quantity?: ")
-            models.Item.create(recipe=recipe, ingredient=ingredient, quantity=quantity)
+            models.RecipeItem.create(
+                recipe=recipe, ingredient=ingredient, quantity=quantity
+            )
         except EOFError:
             continue_ = False
     print("recipe created")
