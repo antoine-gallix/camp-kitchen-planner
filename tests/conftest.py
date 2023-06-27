@@ -1,3 +1,7 @@
+from planner import config
+
+config.in_memory = True
+
 from pytest import fixture
 
 from planner import models
