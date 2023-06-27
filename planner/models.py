@@ -1,4 +1,5 @@
 import re
+from collections import defaultdict
 from enum import Enum, auto
 
 import peewee
@@ -164,13 +165,30 @@ class Project(BaseModel):
     def __repr__(self):
         return f"Project({self.__str__()})"
 
+    @property
+    def recipes(self):
+        return (dish.recipe for dish in self.dishes)
+
     def calculate_shopping_list(self):
         return []
+
+    def shopping_list(self):
+        shopping_list = defaultdict(float)
+        for recipe in self.recipes:
+            for item in recipe.items:
+                shopping_list[item.ingredient] += (
+                    item.quantity * self.servings / recipe.serves
+                )
+        return shopping_list
+
+    def print_shopping_list(self):
+        for ingredient, quantity in self.shopping_list().items():
+            print(f"{ingredient}: {quantity:g}{ingredient.unit}")
 
     def print_scaled(self):
         print(self)
         print()
-        for recipe in (item.recipe for item in self.items):
+        for recipe in self.recipes:
             print(f"{recipe}")
             for item in recipe.items:
                 print(
@@ -179,8 +197,11 @@ class Project(BaseModel):
 
 
 class ProjectItem(BaseModel):
-    project = peewee.ForeignKeyField(Project, backref="items")
+    project = peewee.ForeignKeyField(Project, backref="dishes")
     recipe = peewee.ForeignKeyField(Recipe)
+
+    def __repr__(self):
+        return f""
 
 
 all_models = [Ingredient, Recipe, RecipeItem, Project, ProjectItem]
