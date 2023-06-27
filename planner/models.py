@@ -181,6 +181,11 @@ class Project(BaseModel):
                 )
         return shopping_list
 
+    def print_summary(self):
+        print(self)
+        for recipe in self.recipes:
+            print(f"- {recipe}")
+
     def print_shopping_list(self):
         for ingredient, quantity in self.shopping_list().items():
             print(f"{ingredient}: {quantity:g}{ingredient.unit}")
@@ -201,7 +206,7 @@ class ProjectItem(BaseModel):
     recipe = peewee.ForeignKeyField(Recipe)
 
     def __repr__(self):
-        return f""
+        return f"<ProjectItem({self.recipe} in {self.project})>"
 
 
 all_models = [Ingredient, Recipe, RecipeItem, Project, ProjectItem]

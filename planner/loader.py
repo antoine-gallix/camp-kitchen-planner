@@ -32,3 +32,13 @@ def load_recipe_dir(path):
     logger.info(f"loading recipe directory: {str(path)!r}")
     for recipe_file in Path(path).iterdir():
         load_recipe_file(recipe_file)
+
+
+def load_project_file(path):
+    file_ = Path(path)
+    project_data = yaml.load(file_.read_text(), yaml.Loader)
+    project = models.Project.create(name=file_.stem, servings=project_data["servings"])
+    for recipe_name in project_data["recipes"]:
+        recipe = models.Recipe.get(name=recipe_name)
+        models.ProjectItem.create(project=project, recipe=recipe)
+    return project
