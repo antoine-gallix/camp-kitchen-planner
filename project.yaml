@@ -1,5 +1,4 @@
-recipe: pasta bolognese
-servings: 10
----
-recipe: pan con tomate
-servings: 10
+servings: 40
+recipes:
+  - buddha bowl
+  - cabbage salad
