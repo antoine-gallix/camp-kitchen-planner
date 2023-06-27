@@ -154,7 +154,36 @@ class RecipeItem(BaseModel):
         return item
 
 
-all_models = [Ingredient, Recipe, Item]
+class Project(BaseModel):
+    name = peewee.CharField(unique=True)
+    servings = peewee.IntegerField()
+
+    def __str__(self):
+        return f"{self.name} for {self.servings} persons"
+
+    def __repr__(self):
+        return f"Project({self.__str__()})"
+
+    def calculate_shopping_list(self):
+        return []
+
+    def print_scaled(self):
+        print(self)
+        print()
+        for recipe in (item.recipe for item in self.items):
+            print(f"{recipe}")
+            for item in recipe.items:
+                print(
+                    f"- {item.quantity * self.servings / recipe.serves} {item.ingredient.unit} {item.ingredient}"
+                )
+
+
+class ProjectItem(BaseModel):
+    project = peewee.ForeignKeyField(Project, backref="items")
+    recipe = peewee.ForeignKeyField(Recipe)
+
+
+all_models = [Ingredient, Recipe, RecipeItem, Project, ProjectItem]
 
 
 def create_tables():

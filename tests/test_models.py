@@ -9,6 +9,50 @@ def rollback_transaction_here(rollback_transaction):
     ...
 
 
+@fixture
+def pan():
+    return models.Ingredient.create(name="pan", unit="unit")
+
+
+@fixture
+def tomate():
+    return models.Ingredient.create(name="tomate", unit="g")
+
+
+@fixture
+def caracoles():
+    return models.Ingredient.create(name="caracoles", unit="g")
+
+
+@fixture
+def vinagre():
+    return models.Ingredient.create(name="vinagre", unit="l")
+
+
+@fixture
+def pan_con_tomate(pan, tomate):
+    recipe = models.Recipe.create(name="pan con tomate", serves=1)
+    models.RecipeItem.create(recipe=recipe, ingredient=tomate, quantity=100)
+    models.RecipeItem.create(recipe=recipe, ingredient=pan, quantity=1)
+    return recipe
+
+
+@fixture
+def caracoles_con_vinagre(caracoles, vinagre):
+    recipe = models.Recipe.create(name="caracoles con vinagre", serves=1)
+    models.RecipeItem.create(recipe=recipe, ingredient=caracoles, quantity=50)
+    models.RecipeItem.create(recipe=recipe, ingredient=vinagre, quantity=0.25)
+    return recipe
+
+
+@fixture
+def feast(pan_con_tomate, caracoles_con_vinagre):
+    feast = models.Project.create(name="feast", servings=5)
+    models.ProjectItem.create(recipe=pan_con_tomate, project=feast)
+    models.ProjectItem.create(recipe=caracoles_con_vinagre, project=feast)
+    return feast
+
+
 # ------------------------- Ingredient -------------------------
 
 
@@ -99,3 +143,25 @@ def test__Item__create_from_line():
     assert item.quantity == 2000
     assert item.ingredient.name == "pommes"
     assert item.ingredient.unit == "g"
+
+
+# ------------------------- Project -------------------------
+
+
+def test__Project__create_empty():
+    models.Project.create(name="feast", servings=5)
+
+
+def test__Project__repr():
+    feast = models.Project.create(name="feast", servings=5)
+    assert repr(feast) == "Project(feast for 5 persons)"
+
+
+def test__Project__create_filled(pan_con_tomate, caracoles_con_vinagre):
+    feast = models.Project.create(name="feast", servings=5)
+    models.ProjectItem.create(recipe=pan_con_tomate, project=feast)
+    models.ProjectItem.create(recipe=caracoles_con_vinagre, project=feast)
+
+
+def test__Project__shopping_list(feast):
+    feast.calculate_shopping_list()
