@@ -2,6 +2,7 @@ import re
 from collections import defaultdict
 
 import peewee
+from prettytable import PrettyTable
 
 from planner import logger
 from planner.config import config
@@ -207,12 +208,23 @@ class Project(BaseModel):
             print(f"- {recipe.name}")
 
     def print_shopping_list(self):
+        t = PrettyTable()
+        t.field_names = [
+            "ingredient",
+            "quantity",
+            "price",
+        ]
+
         for ingredient, quantity, price in self.priced_shopping_list():
-            print(f"{ingredient}: {quantity:g}{ingredient.unit} ({price} euros)")
+            main = f"{ingredient}: {quantity:g}{ingredient.unit}"
+            if price is not None:
+                price_str = f"({price} euros)"
+            else:
+                price_str = f"(no price data)"
+            t.add_row((ingredient.name, f"{quantity:.1f} {ingredient.unit}", price_str))
+        print(t)
 
     def print_csv_shopping_list(self):
-        from prettytable import PrettyTable
-
         t = PrettyTable()
 
         t.field_names = [
