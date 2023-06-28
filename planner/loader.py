@@ -47,6 +47,6 @@ def load_project_file(path):
 
 
 def dump_ingredients(file_path):
-    logger.info("writing ingredients in {file_path!r}")
+    logger.info(f"writing ingredients in {file_path!r}")
     serialized = [ingredient.dump() for ingredient in models.Ingredient.select()]
     yaml.dump_all(serialized, Path(file_path).open("w"))
