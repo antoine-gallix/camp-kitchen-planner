@@ -210,6 +210,24 @@ class Project(BaseModel):
         for ingredient, quantity, price in self.priced_shopping_list():
             print(f"{ingredient}: {quantity:g}{ingredient.unit} ({price} euros)")
 
+    def print_csv_shopping_list(self):
+        from prettytable import PrettyTable
+
+        t = PrettyTable()
+
+        t.field_names = [
+            "ingredient",
+            "unit",
+            "quantity",
+            "price",
+        ]
+
+        for ingredient, quantity, price in self.priced_shopping_list():
+            t.add_row(
+                (str(ingredient.name), str(ingredient.unit), quantity, ingredient.price)
+            )
+        print(t.get_csv_string())
+
     def print_scaled(self):
         print(self)
         print()
