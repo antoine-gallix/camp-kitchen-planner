@@ -25,4 +25,5 @@ def add_terminal_sink():
 
 
 logger.remove()  # remove default sink
-add_terminal_sink()
+if config.get("logging_level") is not None:
+    add_terminal_sink()
