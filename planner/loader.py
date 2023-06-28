@@ -44,3 +44,9 @@ def load_project_file(path):
         recipe = models.Recipe.get(name=recipe_name)
         models.ProjectItem.create(project=project, recipe=recipe)
     return project
+
+
+def dump_ingredients(file_path):
+    logger.info("writing ingredients in {file_path!r}")
+    serialized = [ingredient.dump() for ingredient in models.Ingredient.select()]
+    yaml.dump_all(serialized, Path(file_path).open("w"))
