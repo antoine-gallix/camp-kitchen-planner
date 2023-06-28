@@ -32,7 +32,7 @@ def vinagre():
 @fixture
 def pan_con_tomate(pan, tomate):
     recipe = models.Recipe.create(name="pan con tomate", serves=1)
-    models.RecipeItem.create(recipe=recipe, ingredient=tomate, quantity=100)
+    models.RecipeItem.create(recipe=recipe, ingredient=tomate, quantity=0.1)
     models.RecipeItem.create(recipe=recipe, ingredient=pan, quantity=1)
     return recipe
 
@@ -40,7 +40,7 @@ def pan_con_tomate(pan, tomate):
 @fixture
 def caracoles_con_vinagre(caracoles, vinagre):
     recipe = models.Recipe.create(name="caracoles con vinagre", serves=1)
-    models.RecipeItem.create(recipe=recipe, ingredient=caracoles, quantity=50)
+    models.RecipeItem.create(recipe=recipe, ingredient=caracoles, quantity=0.05)
     models.RecipeItem.create(recipe=recipe, ingredient=vinagre, quantity=0.25)
     return recipe
 
@@ -210,5 +210,19 @@ def test__Project__create_filled(pan_con_tomate, caracoles_con_vinagre):
 def test__Project__shopping_list(feast):
     shopping_list = feast.shopping_list()
     assert [
-        (str(ingredient), quantity) for ingredient, quantity in shopping_list.items()
-    ] == [("tomate", 500.0), ("pan", 5.0), ("caracoles", 250.0), ("vinagre", 1.25)]
+        f"{quantity}{ingredient.unit} {ingredient.name}"
+        for ingredient, quantity in shopping_list.items()
+    ] == ["0.5kg tomate", "5.0unit pan", "0.25kg caracoles", "1.25l vinagre"]
+
+
+def test__Project__priced_shopping_list(feast):
+    priced_shopping_list = feast.priced_shopping_list()
+    assert [
+        f"{quantity}{ingredient.unit} {ingredient.name}: {price} euros"
+        for ingredient, quantity, price in priced_shopping_list
+    ] == [
+        "0.5kg tomate: 1.5 euros",
+        "5.0unit pan: 7.5 euros",
+        "0.25kg caracoles: 3.0 euros",
+        "1.25l vinagre: 3.125 euros",
+    ]
