@@ -11,22 +11,22 @@ def rollback_transaction_here(rollback_transaction):
 
 @fixture
 def pan():
-    return models.Ingredient.create(name="pan", unit="unit")
+    return models.Ingredient.create(name="pan", unit="unit", price=1.5)
 
 
 @fixture
 def tomate():
-    return models.Ingredient.create(name="tomate", unit="kg")
+    return models.Ingredient.create(name="tomate", unit="kg", price=3)
 
 
 @fixture
 def caracoles():
-    return models.Ingredient.create(name="caracoles", unit="kg")
+    return models.Ingredient.create(name="caracoles", unit="kg", price=12)
 
 
 @fixture
 def vinagre():
-    return models.Ingredient.create(name="vinagre", unit="l")
+    return models.Ingredient.create(name="vinagre", unit="l", price=2.5)
 
 
 @fixture
