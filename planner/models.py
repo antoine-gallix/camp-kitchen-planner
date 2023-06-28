@@ -30,12 +30,15 @@ class Ingredient(BaseModel):
     unit = peewee.CharField()
     price = peewee.FloatField(null=True)
 
+    valid_units = ["kg", "l", "tsp", "tbsp", "unit"]
+
     class Meta:
         indexes = [(("name", "unit"), True)]
 
     def __init__(self, **kwargs):
-        if "name" in kwargs:
-            kwargs["name"] = normalize_string(kwargs["name"])
+        if (unit := kwargs["unit"]) not in self.valid_units:
+            raise ValueError(f"unit not valid {unit!r}")
+        kwargs["name"] = normalize_string(kwargs["name"])
         super().__init__(**kwargs)
 
     def __str__(self):
