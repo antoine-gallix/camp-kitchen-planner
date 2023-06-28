@@ -8,6 +8,7 @@ import planner.models
 @click.argument("project")
 def plan(project):
     planner.models.create_tables()
+    planner.loader.load_ingredients_from_file("ingredients.yaml")
     planner.loader.load_recipe_dir("recipes")
     project = planner.loader.load_project_file(project)
     project.print_summary()
