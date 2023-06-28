@@ -16,12 +16,12 @@ def pan():
 
 @fixture
 def tomate():
-    return models.Ingredient.create(name="tomate", unit="g")
+    return models.Ingredient.create(name="tomate", unit="kg")
 
 
 @fixture
 def caracoles():
-    return models.Ingredient.create(name="caracoles", unit="g")
+    return models.Ingredient.create(name="caracoles", unit="kg")
 
 
 @fixture
@@ -57,12 +57,36 @@ def feast(pan_con_tomate, caracoles_con_vinagre):
 
 
 def test__Ingredient__save():
-    salsifi = models.Ingredient(name="salsifi", unit="g")
+    salsifi = models.Ingredient(name="salsifi", unit="kg")
     salsifi.save()
 
 
+def test__Ingredient__allowed_units():
+    # weight
+    with raises(ValueError):
+        models.Ingredient(name="salsifi", unit="g")
+    with raises(ValueError):
+        models.Ingredient(name="salsifi", unit="mg")
+    models.Ingredient.create(name="salsifi", unit="kg")
+    # liquids
+    with raises(ValueError):
+        models.Ingredient(name="vinagre", unit="ml")
+    with raises(ValueError):
+        models.Ingredient(name="vinagre", unit="cl")
+    with raises(ValueError):
+        models.Ingredient(name="vinagre", unit="dl")
+    models.Ingredient(name="vinagre", unit="l")
+    # spoons and units
+    models.Ingredient(name="azucar", unit="tsp")
+    models.Ingredient(name="azucal", unit="tbsp")
+    models.Ingredient(name="calabaza", unit="unit")
+    # anything else
+    with raises(ValueError):
+        models.Ingredient(name="flores", unit="bund")
+
+
 def test__Ingredient__price():
-    salsifi = models.Ingredient(name="salsifi", unit="g", price=10)
+    salsifi = models.Ingredient(name="salsifi", unit="kg", price=10)
     salsifi.save()
 
 
@@ -74,38 +98,38 @@ def test__Ingredient__dump():
 
 
 def test__Ingredient__lowercase():
-    salsifi = models.Ingredient(name="Salsifi", unit="g")
+    salsifi = models.Ingredient(name="Salsifi", unit="kg")
     salsifi.save()
     assert salsifi.name == "salsifi"
 
 
 def test__Ingredient__strip():
-    salsifi = models.Ingredient(name="   salsifi   ", unit="g")
+    salsifi = models.Ingredient(name="   salsifi   ", unit="kg")
     salsifi.save()
     assert salsifi.name == "salsifi"
 
 
 def test__Ingredient__squash():
-    salsifi = models.Ingredient(name="chili  con    carne", unit="g")
+    salsifi = models.Ingredient(name="chili  con    carne", unit="kg")
     salsifi.save()
     assert salsifi.name == "chili con carne"
 
 
 def test__Ingredient__repr_str():
-    salsifi = models.Ingredient(name="salsifi", unit="g")
-    assert repr(salsifi) == "<Ingredient(name=salsifi,unit=g)>"
+    salsifi = models.Ingredient(name="salsifi", unit="kg")
+    assert repr(salsifi) == "<Ingredient(name=salsifi,unit=kg)>"
     assert str(salsifi) == "salsifi"
 
 
 def test__Ingredient__unique_name_unit__diff_unit():
-    models.Ingredient.create(name="pommes", unit="g")
+    models.Ingredient.create(name="pommes", unit="kg")
     models.Ingredient.create(name="pommes", unit="unit")
 
 
 def test__Ingredient__unique_name_unit__all_same():
-    models.Ingredient.create(name="pommes", unit="g")
+    models.Ingredient.create(name="pommes", unit="kg")
     with raises(peewee.IntegrityError):
-        models.Ingredient.create(name="pommes", unit="g")
+        models.Ingredient.create(name="pommes", unit="kg")
 
 
 # ------------------------- Recipe -------------------------
