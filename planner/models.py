@@ -48,6 +48,12 @@ class Ingredient(BaseModel):
     def exists(cls, name):
         return cls.get_or_none(cls.name == name) is not None
 
+    def dump(self):
+        dump_ = dict(name=self.name, unit=self.unit)
+        if self.price is not None:
+            dump_["price"] = self.price
+        return dump_
+
 
 class Recipe(BaseModel):
     name = peewee.CharField(unique=True)

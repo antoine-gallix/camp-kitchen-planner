@@ -66,6 +66,13 @@ def test__Ingredient__price():
     salsifi.save()
 
 
+def test__Ingredient__dump():
+    salsifi = models.Ingredient.create(name="salsifi", unit="kg", price=10)
+    assert salsifi.dump() == {"name": "salsifi", "price": 10, "unit": "kg"}
+    salsifi = models.Ingredient.create(name="tomate", unit="kg")
+    assert salsifi.dump() == {"name": "tomate", "unit": "kg"}
+
+
 def test__Ingredient__lowercase():
     salsifi = models.Ingredient(name="Salsifi", unit="g")
     salsifi.save()
