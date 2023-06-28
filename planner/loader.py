@@ -8,18 +8,20 @@ from planner import logger, models
 
 
 def parse_recipe_file(file_path):
-    file_content = Path(file_path).read_text()
+    file_ = Path(file_path)
+    name = file_.stem
+    file_content = file_.read_text()
     parts = map(lambda st: st.strip(), file_content.split("\n---"))
     header, items = list(
         map(lambda part: yaml.load(part, yaml.Loader), list(parts)[:2])
     )
-    return header, items
+    return name, header, items
 
 
 def load_recipe_file(path):
     logger.debug(f"loading recipe {str(path)!r}")
-    header, items = parse_recipe_file(path)
-    recipe = models.Recipe.create(**header)
+    name, header, items = parse_recipe_file(path)
+    recipe = models.Recipe.create(name=name, serves=header["serves"])
     for line in items:
         try:
             item = models.RecipeItem.create_item_from_line(line, recipe)
