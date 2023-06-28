@@ -207,8 +207,8 @@ class Project(BaseModel):
             print(f"- {recipe}")
 
     def print_shopping_list(self):
-        for ingredient, quantity in self.shopping_list().items():
-            print(f"{ingredient}: {quantity:g}{ingredient.unit}")
+        for ingredient, quantity, price in self.priced_shopping_list():
+            print(f"{ingredient}: {quantity:g}{ingredient.unit} ({price} euros)")
 
     def print_scaled(self):
         print(self)
