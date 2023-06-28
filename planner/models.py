@@ -189,6 +189,18 @@ class Project(BaseModel):
                 )
         return shopping_list
 
+    def priced_shopping_list(self):
+        shopping_list = self.shopping_list()
+        priced_shopping_list = [
+            (
+                ingredient,
+                quantity,
+                ingredient.price * quantity if ingredient.price is not None else None,
+            )
+            for ingredient, quantity in shopping_list.items()
+        ]
+        return priced_shopping_list
+
     def print_summary(self):
         print(self)
         for recipe in self.recipes:
