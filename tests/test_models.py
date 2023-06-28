@@ -131,8 +131,8 @@ def test__Recipe__squash():
 
 def test__Recipe__repr_str():
     pan_con_tomate = models.Recipe(name="pan con tomate", serves=1)
-    assert repr(pan_con_tomate) == "<Recipe: pan con tomate>"
-    assert str(pan_con_tomate) == "pan con tomate"
+    assert repr(pan_con_tomate) == "<Recipe: pan con tomate (1 persons)>"
+    assert str(pan_con_tomate) == "pan con tomate (1 persons)"
 
 
 def test__Item__create_from_line():

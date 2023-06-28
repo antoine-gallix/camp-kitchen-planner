@@ -1,10 +1,8 @@
 import re
 from collections import defaultdict
-from enum import Enum, auto
 
 import peewee
 
-import planner.loader
 from planner import logger
 from planner.config import config
 
@@ -30,6 +28,7 @@ class BaseModel(peewee.Model):
 class Ingredient(BaseModel):
     name = peewee.CharField()
     unit = peewee.CharField()
+    price = peewee.FloatField(null=True)
 
     class Meta:
         indexes = [(("name", "unit"), True)]
@@ -40,7 +39,7 @@ class Ingredient(BaseModel):
         super().__init__(**kwargs)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     @classmethod
     def exists(cls, name):
@@ -57,7 +56,7 @@ class Recipe(BaseModel):
         super().__init__(**kwargs)
 
     def __str__(self):
-        return str(self.name)
+        return f"{self.name} ({self.serves} persons)"
 
     @property
     def description(self):
@@ -147,9 +146,9 @@ class RecipeItem(BaseModel):
         number, unit = cls.normalize(number, unit)
         ingredient, created = Ingredient.get_or_create(name=name, unit=unit)
         if created:
-            logger.debug(f"Ingredient has been created")
+            logger.debug("Ingredient has been created")
         else:
-            logger.debug(f"Ingredient already exist")
+            logger.debug("Ingredient already exist")
         item = cls.create(ingredient=ingredient, quantity=number, recipe=recipe)
         logger.debug(f"created item: {item}")
         return item
