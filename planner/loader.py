@@ -50,3 +50,11 @@ def dump_ingredients(file_path):
     logger.info(f"writing ingredients in {file_path!r}")
     serialized = [ingredient.dump() for ingredient in models.Ingredient.select()]
     yaml.dump_all(serialized, Path(file_path).open("w"))
+
+
+def load_ingredients_from_file(file_path):
+    logger.info(f"loading ingredients from file {file_path}")
+    ingredient_data = list(yaml.load_all(Path(file_path).open(), Loader=yaml.Loader))
+    logger.info(f"file contains {len(ingredient_data)} ingredients")
+    for d in ingredient_data:
+        Ingredient.create(**d)
