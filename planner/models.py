@@ -41,6 +41,9 @@ class Ingredient(BaseModel):
     def __str__(self):
         return str(self.name)
 
+    def __repr__(self):
+        return f"<Ingredient(name={self.name},unit={self.unit})>"
+
     @classmethod
     def exists(cls, name):
         return cls.get_or_none(cls.name == name) is not None
@@ -81,7 +84,7 @@ class RecipeItem(BaseModel):
         return f"Item({self.quantity},{self.ingredient})"
 
     def __str__(self):
-        return f"{self.quantity} {self.ingredient.name}"
+        return f"{self.quantity}{self.ingredient.unit} {self.ingredient.name}"
 
     @staticmethod
     def parse_item_line(line):
@@ -123,9 +126,9 @@ class RecipeItem(BaseModel):
     @staticmethod
     def normalize(number, unit):
         unit_map = {
-            "mg": ("g", 1 / 1000),
-            "g": ("g", 1),
-            "kg": ("g", 1000),
+            "mg": ("g", 1 / 10e6),
+            "g": ("g", 1 / 10e3),
+            "kg": ("kg", 1),
             "ml": ("l", 1 / 1000),
             "cl": ("l", 1 / 100),
             "dl": ("l", 1 / 10),
@@ -167,9 +170,6 @@ class Project(BaseModel):
     @property
     def recipes(self):
         return (dish.recipe for dish in self.dishes)
-
-    def calculate_shopping_list(self):
-        return []
 
     def shopping_list(self):
         shopping_list = defaultdict(float)

@@ -61,6 +61,11 @@ def test__Ingredient__save():
     salsifi.save()
 
 
+def test__Ingredient__price():
+    salsifi = models.Ingredient(name="salsifi", unit="g", price=10)
+    salsifi.save()
+
+
 def test__Ingredient__lowercase():
     salsifi = models.Ingredient(name="Salsifi", unit="g")
     salsifi.save()
@@ -81,7 +86,7 @@ def test__Ingredient__squash():
 
 def test__Ingredient__repr_str():
     salsifi = models.Ingredient(name="salsifi", unit="g")
-    assert repr(salsifi) == "<Ingredient: salsifi>"
+    assert repr(salsifi) == "<Ingredient(name=salsifi,unit=g)>"
     assert str(salsifi) == "salsifi"
 
 
@@ -140,9 +145,17 @@ def test__Item__create_from_line():
     models.RecipeItem.create_item_from_line("2kg pommes", recipe)
     assert len(recipe.items) == 1
     item = recipe.items[0]
-    assert item.quantity == 2000
+    assert item.quantity == 2
     assert item.ingredient.name == "pommes"
-    assert item.ingredient.unit == "g"
+    assert item.ingredient.unit == "kg"
+
+
+def test__Item__create_from_line__conversion():
+    recipe = models.Recipe.create(name="compote de pommes", serves=1)
+    pommes_item = models.RecipeItem.create_item_from_line("2kg pommes", recipe)
+    assert str(pommes_item) == "2.0kg pommes"
+    wine_item = models.RecipeItem.create_item_from_line("200ml wine", recipe)
+    assert str(wine_item) == "0.2l wine"
 
 
 # ------------------------- Project -------------------------
@@ -164,4 +177,7 @@ def test__Project__create_filled(pan_con_tomate, caracoles_con_vinagre):
 
 
 def test__Project__shopping_list(feast):
-    feast.calculate_shopping_list()
+    shopping_list = feast.shopping_list()
+    assert [
+        (str(ingredient), quantity) for ingredient, quantity in shopping_list.items()
+    ] == [("tomate", 500.0), ("pan", 5.0), ("caracoles", 250.0), ("vinagre", 1.25)]
