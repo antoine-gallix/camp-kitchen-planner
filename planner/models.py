@@ -135,12 +135,12 @@ class RecipeItem(BaseModel):
     @staticmethod
     def normalize(number, unit):
         unit_map = {
-            "mg": ("g", 1 / 10e6),
-            "g": ("g", 1 / 10e3),
+            "mg": ("kg", 1e-6),
+            "g": ("kg", 1e-3),
             "kg": ("kg", 1),
-            "ml": ("l", 1 / 1000),
-            "cl": ("l", 1 / 100),
-            "dl": ("l", 1 / 10),
+            "ml": ("l", 1e-3),
+            "cl": ("l", 1e-2),
+            "dl": ("l", 1e-1),
             "l": ("l", 1),
             None: ("unit", 1),
             "": ("unit", 1),
@@ -148,7 +148,7 @@ class RecipeItem(BaseModel):
             "tsp": ("tsp", 1),
         }
         unit, scale = unit_map[unit]
-        number = number * scale
+        number *= scale
         return number, unit
 
     @classmethod

@@ -183,8 +183,8 @@ def test__Item__create_from_line():
 
 def test__Item__create_from_line__conversion():
     recipe = models.Recipe.create(name="compote de pommes", serves=1)
-    pommes_item = models.RecipeItem.create_item_from_line("2kg pommes", recipe)
-    assert str(pommes_item) == "2.0kg pommes"
+    pommes_item = models.RecipeItem.create_item_from_line("200g pommes", recipe)
+    assert str(pommes_item) == "0.2kg pommes"
     wine_item = models.RecipeItem.create_item_from_line("200ml wine", recipe)
     assert str(wine_item) == "0.2l wine"
 
