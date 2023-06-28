@@ -57,4 +57,4 @@ def load_ingredients_from_file(file_path):
     ingredient_data = list(yaml.load_all(Path(file_path).open(), Loader=yaml.Loader))
     logger.info(f"file contains {len(ingredient_data)} ingredients")
     for d in ingredient_data:
-        Ingredient.create(**d)
+        models.Ingredient.create(**d)
