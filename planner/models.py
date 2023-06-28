@@ -204,7 +204,7 @@ class Project(BaseModel):
     def print_summary(self):
         print(self)
         for recipe in self.recipes:
-            print(f"- {recipe}")
+            print(f"- {recipe.name}")
 
     def print_shopping_list(self):
         for ingredient, quantity, price in self.priced_shopping_list():
