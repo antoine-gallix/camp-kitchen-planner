@@ -165,9 +165,13 @@ def test__Recipe__squash():
     assert salsifi.name == "chili con carne"
 
 
-def test__Recipe__repr_str():
+def test__Recipe__repr():
     pan_con_tomate = models.Recipe(name="pan con tomate", serves=1)
     assert repr(pan_con_tomate) == "<Recipe: pan con tomate (1 persons)>"
+
+
+def test__Recipe__str():
+    pan_con_tomate = models.Recipe(name="pan con tomate", serves=1)
     assert str(pan_con_tomate) == "pan con tomate (1 persons)"
 
 
