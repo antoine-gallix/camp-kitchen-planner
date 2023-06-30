@@ -19,7 +19,7 @@ funcy = "^2.0"
 pytest = "^7.3.2"
 
 [tool.poetry.scripts]
-planner = "planner_tool:plan"
+planner = "planner_tool:main"
 
 [build-system]
 requires = ["poetry-core"]
