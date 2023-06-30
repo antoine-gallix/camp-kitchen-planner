@@ -98,7 +98,18 @@ class Recipe(BaseModel):
         return "\n".join(lines)
 
     def rescale(self, servings):
-        ...
+        rescaled = Recipe.create(
+            name=f"{self.name} rescaled",
+            serves=servings,
+            instructions=self.instructions,
+        )
+        for item in self.items:
+            RecipeItem.create(
+                recipe=rescaled,
+                ingredient=item.ingredient,
+                quantity=item.quantity * servings / self.serves,
+            )
+        return rescaled
 
 
 class RecipeItem(BaseModel):

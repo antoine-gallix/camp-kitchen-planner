@@ -279,6 +279,13 @@ def test__Recipe__full__with_instructions(pan_con_tomate):
     )
 
 
+def test__Recipe__full__rescale(pan_con_tomate):
+    rescaled = pan_con_tomate.rescale(5)
+    assert rescaled.name == "pan con tomate rescaled"
+    assert rescaled.serves == 5
+    assert [str(item) for item in rescaled.items] == ["0.5kg tomate", "5.0unit pan"]
+
+
 # ------------------------- Project -------------------------
 
 
