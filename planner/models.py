@@ -62,6 +62,7 @@ class Ingredient(BaseModel):
 class Recipe(BaseModel):
     name = peewee.CharField(unique=True)
     serves = peewee.IntegerField()
+    instructions = peewee.CharField(null=True)
 
     def __init__(self, **kwargs):
         if "name" in kwargs:
@@ -91,7 +92,7 @@ class RecipeItem(BaseModel):
     quantity = peewee.FloatField()
 
     def __repr__(self):
-        return f"Item({self.quantity},{self.ingredient})"
+        return f"Item({self.quantity},{self.ingredient}({self.ingredient.unit}))"
 
     def __str__(self):
         return f"{self.quantity}{self.ingredient.unit} {self.ingredient.name}"

@@ -11,23 +11,28 @@ def parse_recipe_file(file_path):
     file_ = Path(file_path)
     name = file_.stem
     file_content = file_.read_text()
-    parts = map(lambda st: st.strip(), file_content.split("\n---"))
-    header, items = list(
-        map(lambda part: yaml.load(part, yaml.Loader), list(parts)[:2])
-    )
-    return name, header, items
+    parts = list(map(lambda st: st.strip(), file_content.split("\n---")))
+    header, items = list(map(lambda part: yaml.load(part, yaml.Loader), parts[:2]))
+    try:
+        instructions = parts[2]
+    except IndexError:
+        instructions = None
+    return name, header, items, instructions
 
 
 def load_recipe_file(path):
     logger.debug(f"loading recipe {str(path)!r}")
-    name, header, items = parse_recipe_file(path)
-    recipe = models.Recipe.create(name=name, serves=header["serves"])
+    name, header, items, instructions = parse_recipe_file(path)
+    recipe = models.Recipe.create(
+        name=name, serves=header["serves"], instructions=instructions
+    )
     for line in items:
         try:
             item = models.RecipeItem.create_item_from_line(line, recipe)
         except:
             logger.debug(f"could not parse item line: {line}")
             raise
+    return recipe
 
 
 def load_recipe_dir(path):
