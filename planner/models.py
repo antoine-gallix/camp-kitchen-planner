@@ -85,6 +85,21 @@ class Recipe(BaseModel):
     def exists(cls, name):
         return cls.get_or_none(cls.name == name) is not None
 
+    def full(self):
+        lines = []
+        lines.append(f"serves: {self.serves}")
+        lines.append("---")
+        for item in self.items:
+            lines.append(f"- {item.quantity}{item.ingredient.unit} {item.ingredient}")
+        if self.instructions is not None:
+            lines.append("---")
+            lines.append(self.instructions)
+
+        return "\n".join(lines)
+
+    def rescale(self, servings):
+        ...
+
 
 class RecipeItem(BaseModel):
     recipe = peewee.ForeignKeyField(Recipe, backref="items")

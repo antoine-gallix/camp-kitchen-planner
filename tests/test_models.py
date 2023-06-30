@@ -258,6 +258,23 @@ def test__parse_item_line__ingredient_starts_with_l():
     assert models.RecipeItem.parse_item_line("1 lemon") == ("lemon", 1, None)
 
 
+def test__Recipe__str(pan_con_tomate):
+    assert str(pan_con_tomate) == "pan con tomate (1 persons)"
+
+
+def test__Recipe__full__no_instructions(pan_con_tomate):
+    assert pan_con_tomate.full() == "serves: 1\n---\n- 0.1kg tomate\n- 1.0unit pan"
+
+
+def test__Recipe__full__with_instructions(pan_con_tomate):
+    pan_con_tomate.instructions = "grate the tomate\nput on top of the bread"
+    assert (
+        pan_con_tomate.full()
+        == "serves: 1\n---\n- 0.1kg tomate\n- 1.0unit pan\n---\ngrate the tomate\nput"
+        " on top of the bread"
+    )
+
+
 # ------------------------- Project -------------------------
 
 
