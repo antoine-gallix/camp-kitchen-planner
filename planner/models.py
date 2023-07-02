@@ -236,6 +236,14 @@ class Project(BaseModel):
 
     def print_shopping_list(self):
         t = PrettyTable()
+        t.field_names = ["ingredient", "quantity"]
+
+        for ingredient, quantity in self.shopping_list().items():
+            t.add_row((ingredient.name, f"{quantity:.1f} {ingredient.unit}"))
+        print(t)
+
+    def print_priced_shopping_list(self):
+        t = PrettyTable()
         t.field_names = [
             "ingredient",
             "quantity",
