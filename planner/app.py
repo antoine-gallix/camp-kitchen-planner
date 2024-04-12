@@ -2,7 +2,7 @@ from textual.app import App
 from textual.containers import Container, Horizontal, Vertical
 from textual.widgets import Button, Header, Label, Static
 
-import models
+from planner import models
 
 
 def view_recipes():
@@ -29,8 +29,3 @@ class MyApp(App):
                 id="right_panel",
             ),
         )
-
-
-if __name__ == "__main__":
-    app = MyApp()
-    app.run()
