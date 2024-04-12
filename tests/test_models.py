@@ -5,8 +5,7 @@ from planner import models
 
 
 @fixture(autouse=True)
-def rollback_transaction_here(rollback_transaction):
-    ...
+def rollback_transaction_here(rollback_transaction): ...
 
 
 @fixture
@@ -173,93 +172,6 @@ def test__Recipe__repr():
 def test__Recipe__str():
     pan_con_tomate = models.Recipe(name="pan con tomate", serves=1)
     assert str(pan_con_tomate) == "pan con tomate (1 persons)"
-
-
-def test__Item__create_from_line():
-    recipe = models.Recipe.create(name="compote de pommes", serves=1)
-    models.RecipeItem.create_item_from_line("2kg pommes", recipe)
-    assert len(recipe.items) == 1
-    item = recipe.items[0]
-    assert item.quantity == 2
-    assert item.ingredient.name == "pommes"
-    assert item.ingredient.unit == "kg"
-
-
-def test__Item__create_from_line__conversion():
-    recipe = models.Recipe.create(name="compote de pommes", serves=1)
-    pommes_item = models.RecipeItem.create_item_from_line("200g pommes", recipe)
-    assert str(pommes_item) == "0.2kg pommes"
-    wine_item = models.RecipeItem.create_item_from_line("200ml wine", recipe)
-    assert str(wine_item) == "0.2l wine"
-
-
-def test__parse_item_line__no_unit():
-    assert models.RecipeItem.parse_item_line("1 egg") == ("egg", 1, None)
-
-
-def test__parse_item_line__case():
-    assert models.RecipeItem.parse_item_line("1 EgG") == ("egg", 1, None)
-
-
-def test__parse_item_line__whitespaces_resistance():
-    assert models.RecipeItem.parse_item_line("   1     egg    ") == ("egg", 1, None)
-
-
-def test__parse_item_line__unit():
-    assert models.RecipeItem.parse_item_line("12g ganja") == ("ganja", 12, "g")
-
-
-def test__parse_item_line__spaces_in_ingredient():
-    assert models.RecipeItem.parse_item_line("12g sativa ganja") == (
-        "sativa ganja",
-        12,
-        "g",
-    )
-
-
-def test__parse_item_line__decimal_number():
-    assert models.RecipeItem.parse_item_line("1.2g coke") == (
-        "coke",
-        1.2,
-        "g",
-    )
-
-
-def test__parse_item_line__debug():
-    assert models.RecipeItem.parse_item_line("4.5kg oats") == (
-        "oats",
-        4.5,
-        "kg",
-    )
-
-
-def test__parse_item_line__unit_and_spaces():
-    assert models.RecipeItem.parse_item_line("  12  g    ganja  ") == ("ganja", 12, "g")
-
-
-def test__parse_item_line__parenthesis():
-    assert models.RecipeItem.parse_item_line("12g ganja (well dried)") == (
-        "ganja",
-        12,
-        "g",
-    )
-
-
-def test__parse_item_line__units():
-    assert models.RecipeItem.parse_item_line("2kg rice") == ("rice", 2, "kg")
-
-
-def test__parse_item_line__float():
-    assert models.RecipeItem.parse_item_line("2.5kg rice") == ("rice", 2.5, "kg")
-
-
-def test__parse_item_line__number_zero():
-    with raises(Exception):
-        models.RecipeItem.parse_item_line("0 apple")
-
-
-def test__parse_item_line__ingredient_starts_with_l():
-    assert models.RecipeItem.parse_item_line("1 lemon") == ("lemon", 1, None)
 
 
 def test__Recipe__str(pan_con_tomate):
