@@ -3,6 +3,7 @@ import click
 from planner import loader
 from planner import explore
 from planner import models
+from planner import app
 
 main = click.Group()
 
@@ -34,6 +35,13 @@ def rescale(recipe, servings) -> None:
 
 
 @main.command()
+def dump_ingredient_from_recipes() -> None:
+    models.create_tables()
+    loader.load_recipe_dir("recipes/")
+    loader.dump_ingredients("ingredients.yaml")
+
+
+@main.command()
 def list_recipe() -> None:
     explore.print_instances(models.Project)
 
@@ -57,3 +65,8 @@ def reset_db() -> None:
 def db_summary() -> None:
     for model in [models.Project, models.Recipe, models.Ingredient]:
         print(f"{model.__name__} : {explore.count_instances(model)}")
+
+
+@main.command()
+def run() -> None:
+    app.MyApp().run()
