@@ -39,3 +39,8 @@ def recipe() -> None:
             print(recipe)
     else:
         print("no recipes")
+
+
+@main.command()
+def reset_db() -> None:
+    planner.models.reset_tables()
