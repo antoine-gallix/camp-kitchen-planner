@@ -2,17 +2,35 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+import funcy
 import yaml
-
+from typing import Any
 from planner import logger, models
 
 
-def parse_recipe_file(file_path):
+def parse_recipe_file(
+    file_path,
+) -> tuple[str, Any, Any, Any | None]:
+    """Parse sections from a recipe file
+
+    ```recipe file format
+    header
+    ---
+    items
+    ---
+    [instructions]
+    ```
+
+    - header and items are yaml format
+    - instructions are plain text and optional
+
+    """
     file_ = Path(file_path)
     name = file_.stem
     file_content = file_.read_text()
-    parts = list(map(lambda st: st.strip(), file_content.split("\n---")))
-    header, items = list(map(lambda part: yaml.load(part, yaml.Loader), parts[:2]))
+    parts = [section.strip() for section in file_content.split("\n---")]
+    header = yaml.load(parts[0], yaml.Loader)
+    items = yaml.load(parts[1], yaml.Loader)
     try:
         instructions = parts[2]
     except IndexError:
@@ -20,7 +38,7 @@ def parse_recipe_file(file_path):
     return name, header, items, instructions
 
 
-def load_recipe_file(path):
+def load_recipe_file(path) -> models.Recipe:
     logger.debug(f"loading recipe {str(path)!r}")
     name, header, items, instructions = parse_recipe_file(path)
     recipe = models.Recipe.create(
@@ -35,13 +53,13 @@ def load_recipe_file(path):
     return recipe
 
 
-def load_recipe_dir(path):
+def load_recipe_dir(path) -> None:
     logger.info(f"loading recipe directory: {str(path)!r}")
     for recipe_file in Path(path).iterdir():
         load_recipe_file(recipe_file)
 
 
-def load_project_file(path):
+def load_project_file(path) -> models.Project:
     file_ = Path(path)
     project_data = yaml.load(file_.read_text(), yaml.Loader)
     project = models.Project.create(name=file_.stem, servings=project_data["servings"])
@@ -51,13 +69,13 @@ def load_project_file(path):
     return project
 
 
-def dump_ingredients(file_path):
+def dump_ingredients(file_path) -> None:
     logger.info(f"writing ingredients in {file_path!r}")
     serialized = [ingredient.dump() for ingredient in models.Ingredient.select()]
     yaml.dump_all(serialized, Path(file_path).open("w"))
 
 
-def load_ingredients_from_file(file_path):
+def load_ingredients_from_file(file_path) -> None:
     logger.info(f"loading ingredients from file {file_path}")
     ingredient_data = list(yaml.load_all(Path(file_path).open(), Loader=yaml.Loader))
     logger.info(f"file contains {len(ingredient_data)} ingredients")
