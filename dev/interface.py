@@ -1,7 +1,7 @@
 from collections import defaultdict
 
-import loader
-import models
+from planner import loader
+from planner import models
 from prettytable import PrettyTable
 
 import dialog
