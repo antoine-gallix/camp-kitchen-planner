@@ -54,6 +54,12 @@ def list_recipe() -> None:
 
 
 @main.command()
+@click.argument("file", type=click.Path(exists=True, readable=True))
+def load_recipe_file(file) -> None:
+    loader.load_recipe_file(file)
+
+
+@main.command()
 def list_project() -> None:
     explore.print_instances(models.Recipe)
 
