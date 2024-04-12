@@ -1,11 +1,18 @@
 import click
 
+from planner import config
 from planner import loader
 from planner import explore
 from planner import models
 from planner import app
+from rich import print
 
 main = click.Group()
+
+
+@main.command("config")
+def config_() -> None:
+    print(config.as_dict())
 
 
 @main.command()
