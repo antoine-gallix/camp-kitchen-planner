@@ -39,8 +39,25 @@ def recipe() -> None:
             print(recipe)
     else:
         print("no recipes")
+def list_recipe() -> None:
+    explore.print_instances(models.Project)
+
+
+@main.command()
+def list_project() -> None:
+    explore.print_instances(models.Recipe)
+
+
+@main.command()
+def list_ingredient() -> None:
+    explore.print_instances(models.Ingredient)
 
 
 @main.command()
 def reset_db() -> None:
     planner.models.reset_tables()
+
+@main.command()
+def db_summary() -> None:
+    for model in [models.Project, models.Recipe, models.Ingredient]:
+        print(f"{model.__name__} : {explore.count_instances(model)}")
