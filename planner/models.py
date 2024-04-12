@@ -36,23 +36,23 @@ class Ingredient(BaseModel):
     class Meta:
         indexes = [(("name", "unit"), True)]
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         if (unit := kwargs["unit"]) not in self.valid_units:
             raise ValueError(f"unit not valid {unit!r}")
         kwargs["name"] = normalize_string(kwargs["name"])
         super().__init__(**kwargs)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.name)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Ingredient(name={self.name},unit={self.unit})>"
 
     @classmethod
-    def exists(cls, name):
+    def exists(cls, name) -> bool:
         return cls.get_or_none(cls.name == name) is not None
 
-    def dump(self):
+    def dump(self) -> dict:
         dump_ = dict(name=self.name, unit=self.unit)
         if self.price is not None:
             dump_["price"] = self.price
@@ -64,16 +64,16 @@ class Recipe(BaseModel):
     serves = peewee.IntegerField()
     instructions = peewee.CharField(null=True)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         if "name" in kwargs:
             kwargs["name"] = normalize_string(kwargs["name"])
         super().__init__(**kwargs)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.serves} persons)"
 
     @property
-    def description(self):
+    def description(self) -> str:
         description_ = [str(self)]
         for item in getattr(self, "items"):
             description_.append(
@@ -82,7 +82,7 @@ class Recipe(BaseModel):
         return "\n".join(description_)
 
     @classmethod
-    def exists(cls, name):
+    def exists(cls, name) -> bool:
         return cls.get_or_none(cls.name == name) is not None
 
     def full(self):
@@ -117,10 +117,10 @@ class RecipeItem(BaseModel):
     ingredient = peewee.ForeignKeyField(Ingredient)
     quantity = peewee.FloatField()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Item({self.quantity},{self.ingredient}({self.ingredient.unit}))"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.quantity}{self.ingredient.unit} {self.ingredient.name}"
 
     @staticmethod
@@ -198,10 +198,10 @@ class Project(BaseModel):
     name = peewee.CharField(unique=True)
     servings = peewee.IntegerField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} for {self.servings} persons"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Project({self.__str__()})"
 
     @property
