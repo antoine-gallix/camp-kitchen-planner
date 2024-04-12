@@ -1,7 +1,7 @@
 from collections import defaultdict
 
-import loader
-import models
+from planner import loader
+from planner import models
 
 
 def make_shopping_list(project_file):
