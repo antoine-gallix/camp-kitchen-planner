@@ -19,6 +19,8 @@ class BaseModel(peewee.Model):
 
 
 class Ingredient(BaseModel):
+    """Ingredient to be used in recipes. Have a fixed unit of count and price"""
+
     name = peewee.CharField()
     unit = peewee.CharField()
     price = peewee.FloatField(null=True)
@@ -52,6 +54,8 @@ class Ingredient(BaseModel):
 
 
 class Recipe(BaseModel):
+    """Ingredient, quantities and instructions"""
+
     name = peewee.CharField(unique=True)
     serves = peewee.IntegerField()
     instructions = peewee.CharField(null=True)
@@ -105,6 +109,8 @@ class Recipe(BaseModel):
 
 
 class RecipeItem(BaseModel):
+    """An item of a recipe. Ingredient and Quantity"""
+
     recipe = peewee.ForeignKeyField(Recipe, backref="items")
     ingredient = peewee.ForeignKeyField(Ingredient)
     quantity = peewee.FloatField()
@@ -187,6 +193,8 @@ class RecipeItem(BaseModel):
 
 
 class Project(BaseModel):
+    """Multiple dishes for a certain number of servings"""
+
     name = peewee.CharField(unique=True)
     servings = peewee.IntegerField()
 
@@ -279,10 +287,12 @@ class Project(BaseModel):
 
 
 class ProjectItem(BaseModel):
+    """A dish of a project"""
+
     project = peewee.ForeignKeyField(Project, backref="dishes")
     recipe = peewee.ForeignKeyField(Recipe)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<ProjectItem({self.recipe} in {self.project})>"
 
 
@@ -292,12 +302,14 @@ all_models = [Ingredient, Recipe, RecipeItem, Project, ProjectItem]
 all_models = [Ingredient, Recipe, Project]
 
 
-def create_tables():
+def create_tables() -> None:
+    """Create tables, if they don't exist"""
     logger.debug("creating tables")
     db.create_tables(all_models)
 
 
-def reset_tables():
+def reset_tables() -> None:
+    """Destructive reset"""
     logger.debug("reseting tables")
     db.drop_tables(all_models)
     db.create_tables(all_models)
