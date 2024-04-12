@@ -6,6 +6,7 @@ from planner import explore
 from planner import models
 from planner import app
 from rich import print
+from planner import db
 
 main = click.Group()
 
