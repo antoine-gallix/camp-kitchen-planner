@@ -294,7 +294,10 @@ class ProjectItem(BaseModel):
         return f"<ProjectItem({self.recipe} in {self.project})>"
 
 
+# All model classes
 all_models = [Ingredient, Recipe, RecipeItem, Project, ProjectItem]
+# Entity models
+all_models = [Ingredient, Recipe, Project]
 
 
 def create_tables():
