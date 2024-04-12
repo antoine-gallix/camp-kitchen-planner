@@ -1,7 +1,8 @@
 import click
 
-import planner.loader
-import planner.models
+from planner import loader
+from planner import explore
+from planner import models
 
 main = click.Group()
 
@@ -10,10 +11,10 @@ main = click.Group()
 @click.argument("project")
 @click.option("--csv", is_flag=True)
 def compute(project, csv) -> None:
-    planner.models.create_tables()
-    planner.loader.load_ingredients_from_file("ingredients.yaml")
-    planner.loader.load_recipe_dir("recipes")
-    project = planner.loader.load_project_file(project)
+    models.create_tables()
+    loader.load_ingredients_from_file("ingredients.yaml")
+    loader.load_recipe_dir("recipes")
+    project = loader.load_project_file(project)
     if csv is True:
         project.print_csv_shopping_list()
     else:
@@ -26,19 +27,13 @@ def compute(project, csv) -> None:
 @click.argument("recipe")
 @click.argument("servings", type=click.FLOAT)
 def rescale(recipe, servings) -> None:
-    planner.models.create_tables()
-    recipe = planner.loader.load_recipe_file(recipe)
+    models.create_tables()
+    recipe = loader.load_recipe_file(recipe)
     rescaled = recipe.rescale(servings)
     print(rescaled.full())
 
 
 @main.command()
-def recipe() -> None:
-    if recipes := planner.models.Recipe.select().get_or_none():
-        for recipe in recipes:
-            print(recipe)
-    else:
-        print("no recipes")
 def list_recipe() -> None:
     explore.print_instances(models.Project)
 
@@ -55,7 +50,8 @@ def list_ingredient() -> None:
 
 @main.command()
 def reset_db() -> None:
-    planner.models.reset_tables()
+    models.reset_tables()
+
 
 @main.command()
 def db_summary() -> None:
