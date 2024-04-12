@@ -83,3 +83,7 @@ def db_summary() -> None:
 @main.command()
 def run() -> None:
     app.MyApp().run()
+
+
+if __name__ == "__main__":
+    main()
