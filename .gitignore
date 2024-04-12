@@ -164,3 +164,7 @@ cython_debug/
 dev.py
 dev_*.py
 *.db
+
+# ---------------- planner -----------------
+
+config.toml
