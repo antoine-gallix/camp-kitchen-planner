@@ -30,3 +30,12 @@ def rescale(recipe, servings) -> None:
     recipe = planner.loader.load_recipe_file(recipe)
     rescaled = recipe.rescale(servings)
     print(rescaled.full())
+
+
+@main.command()
+def recipe() -> None:
+    if recipes := planner.models.Recipe.select().get_or_none():
+        for recipe in recipes:
+            print(recipe)
+    else:
+        print("no recipes")
