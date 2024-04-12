@@ -7,7 +7,7 @@ import funcy
 import yaml
 from typing import Any
 from planner import logger, models
-
+from planner import db
 
 # ------------------------- ingredients -------------------------
 
@@ -16,11 +16,96 @@ def load_ingredients_from_file(file_path) -> None:
     logger.info(f"loading ingredients from file {file_path}")
     ingredient_data = list(yaml.load_all(Path(file_path).open(), Loader=yaml.Loader))
     logger.info(f"file contains {len(ingredient_data)} ingredients")
-    for d in ingredient_data:
-        models.Ingredient.create(**d)
+    with db.atomic():
+        for d in ingredient_data:
+            models.Ingredient.create(**d)
 
 
 # ------------------------- recipe -------------------------
+
+
+def normalize_quantity(number, unit) -> tuple[str, float | int]:
+    """Convert a quantity to the standard unit of its class"""
+    match unit:
+        case "mg":
+            return number * 1e-6, "kg"
+        case "g":
+            return number * 1e-3, "kg"
+        case "kg":
+            return number, "kg"
+        case "ml":
+            return number * 1e-3, "l"
+        case "cl":
+            return number * 1e-2, "l"
+        case "dl":
+            return number * 1e-1, "l"
+        case "l":
+            return number, "l"
+        case None:
+            return number, "unit"
+        case "":
+            unit = number, "unit"
+        case "tbsp":
+            unit = number, "tbsp"
+        case "tsp":
+            unit = number, "tsp"
+        case _:
+            raise ValueError(f"unrecognized unit: {unit}")
+
+
+def parse_item_line(line):
+    """Parse elements out of an item line from a recipe file"""
+    # pre-process
+    line = line.lower()
+    line = re.sub(r"\s+", " ", line)  # conpact spaces
+    line = line.strip()  # remove border spaces
+
+    # regexes
+    UNIT_SYMBOLS = ["g", "kg", "L", "l", "ml", "cl", "tsp", "tbsp"]
+    UNIT_SYMBOL_REGEX = f"({'|'.join(UNIT_SYMBOLS)})"
+    NUMBER_REGEX = r"[\d\.]+"
+    QUANTITY_REGEX = NUMBER_REGEX + r"\s?" + f"{UNIT_SYMBOL_REGEX}?" + r"(?=\s)"
+    PARENTHESIS_REGEX = r"\((.*)\)"
+
+    # extract quantity
+    res = re.search(QUANTITY_REGEX, line)
+    if res is not None:
+        quantity = res.group()
+        rest = line[res.end() :].strip()
+    else:
+        raise Exception(f"quantity string not found in {line!r}")
+    # extract number
+    res = re.search(NUMBER_REGEX, quantity)
+    number = float(res.group())
+    unit = quantity[res.end() :].strip() or None
+
+    if number == 0:
+        raise Exception(f"parsed number is zero in line {line}")
+
+    # extract parenthesis
+    res = re.search(PARENTHESIS_REGEX, rest)
+    if res is not None:
+        ingredient = rest[: res.start()].strip()
+    else:
+        ingredient = rest
+    return ingredient, number, unit
+
+
+def create_item_from_line(line, recipe) -> models.RecipeItem:
+    name, number, unit = parse_item_line(line)
+    number, unit = normalize_quantity(number, unit)
+    if (
+        ingredient := models.Ingredient.select()
+        .where(models.Ingredient.name == name, models.Ingredient.unit == unit)
+        .get_or_none()
+    ):
+        logger.debug("ingredient found in database")
+    else:
+        ingredient = models.Ingredient(name=name, unit=unit)
+        logger.debug(f"new ingredient created: {ingredient}")
+    item = models.RecipeItem(ingredient=ingredient, quantity=number, recipe=recipe)
+    logger.debug(f"recipe item created: {item}")
+    return item
 
 
 def _parse_recipe_file(

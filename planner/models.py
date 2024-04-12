@@ -121,62 +121,6 @@ class RecipeItem(BaseModel):
     def __str__(self) -> str:
         return f"{self.quantity}{self.ingredient.unit} {self.ingredient.name}"
 
-    @staticmethod
-    def parse_item_line(line):
-        # pre-process
-        line = line.lower()
-        line = re.sub(r"\s+", " ", line)  # conpact spaces
-        line = line.strip()  # remove border spaces
-
-        # regexes
-        UNIT_SYMBOLS = ["g", "kg", "L", "l", "ml", "cl", "tsp", "tbsp"]
-        UNIT_SYMBOL_REGEX = f"({'|'.join(UNIT_SYMBOLS)})"
-        NUMBER_REGEX = r"[\d\.]+"
-        QUANTITY_REGEX = NUMBER_REGEX + r"\s?" + f"{UNIT_SYMBOL_REGEX}?" + r"(?=\s)"
-        PARENTHESIS_REGEX = r"\((.*)\)"
-
-        # extract quantity
-        res = re.search(QUANTITY_REGEX, line)
-        if res is not None:
-            quantity = res.group()
-            rest = line[res.end() :].strip()
-        else:
-            raise Exception(f"quantity string not found in {line!r}")
-        # extract number
-        res = re.search(NUMBER_REGEX, quantity)
-        number = float(res.group())
-        unit = quantity[res.end() :].strip() or None
-
-        if number == 0:
-            raise Exception(f"parsed number is zero in line {line}")
-
-        # extract parenthesis
-        res = re.search(PARENTHESIS_REGEX, rest)
-        if res is not None:
-            ingredient = rest[: res.start()].strip()
-        else:
-            ingredient = rest
-        return ingredient, number, unit
-
-    @staticmethod
-    def normalize(number, unit):
-        unit_map = {
-            "mg": ("kg", 1e-6),
-            "g": ("kg", 1e-3),
-            "kg": ("kg", 1),
-            "ml": ("l", 1e-3),
-            "cl": ("l", 1e-2),
-            "dl": ("l", 1e-1),
-            "l": ("l", 1),
-            None: ("unit", 1),
-            "": ("unit", 1),
-            "tbsp": ("tbsp", 1),
-            "tsp": ("tsp", 1),
-        }
-        unit, scale = unit_map[unit]
-        number *= scale
-        return number, unit
-
     @classmethod
     def create_item_from_line(cls, line, recipe):
         name, number, unit = cls.parse_item_line(line)
