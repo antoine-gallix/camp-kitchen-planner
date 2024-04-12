@@ -9,7 +9,7 @@ main = click.Group()
 @main.command()
 @click.argument("project")
 @click.option("--csv", is_flag=True)
-def compute(project, csv):
+def compute(project, csv) -> None:
     planner.models.create_tables()
     planner.loader.load_ingredients_from_file("ingredients.yaml")
     planner.loader.load_recipe_dir("recipes")
@@ -25,7 +25,7 @@ def compute(project, csv):
 @main.command()
 @click.argument("recipe")
 @click.argument("servings", type=click.FLOAT)
-def rescale(recipe, servings):
+def rescale(recipe, servings) -> None:
     planner.models.create_tables()
     recipe = planner.loader.load_recipe_file(recipe)
     rescaled = recipe.rescale(servings)
