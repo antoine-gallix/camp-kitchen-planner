@@ -57,16 +57,17 @@ def load_recipe_file(path) -> models.Recipe:
     """Reads a recipe file and load recipe in database"""
     logger.debug(f"loading recipe {str(path)!r}")
     name, header, items, instructions = _parse_recipe_file(path)
-    recipe = models.Recipe.create(
-        name=name, serves=header["serves"], instructions=instructions
-    )
-    for line in items:
-        try:
-            item = models.RecipeItem.create_item_from_line(line, recipe)
-        except:
-            logger.debug(f"could not parse item line: {line}")
-            raise
-    return recipe
+    with db.atomic():
+        recipe = models.Recipe.create(
+            name=name, serves=header["serves"], instructions=instructions
+        )
+        for line in items:
+            try:
+                item = models.RecipeItem.create_item_from_line(line, recipe)
+            except:
+                logger.debug(f"could not parse item line: {line}")
+                raise
+        return recipe
 
 
 def load_recipe_dir(path) -> None:
