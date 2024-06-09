@@ -1,12 +1,16 @@
 import re
 from collections import defaultdict
+from typing import Self
 
+import funcy
 import peewee
 from prettytable import PrettyTable
+from rich import print
 
 from planner import logger
 from planner.config import config
 from planner.database import db
+from planner.parse import Unit, parse_recipe_file
 
 
 def normalize_string(string):
@@ -18,21 +22,27 @@ class BaseModel(peewee.Model):
         database = db
 
 
+class UnitField(peewee.CharField):
+
+    def db_value(self, unit:Unit):
+        return str(unit)
+
+    def python_value(self, value):
+        return Unit(value)
+
 class Ingredient(BaseModel):
     """Ingredient to be used in recipes. Have a fixed unit of count and price"""
 
     name = peewee.CharField()
-    unit = peewee.CharField()
+    unit = UnitField()
     price = peewee.FloatField(null=True)
-
-    valid_units = ["kg", "l", "tsp", "tbsp", "unit"]
 
     class Meta:
         indexes = [(("name", "unit"), True)]
 
     def __init__(self, **kwargs) -> None:
-        if (unit := kwargs["unit"]) not in self.valid_units:
-            raise ValueError(f"unit not valid {unit!r}")
+        if not isinstance(unit:=kwargs["unit"],Unit):
+            kwargs["unit"]=Unit(unit)
         kwargs["name"] = normalize_string(kwargs["name"])
         super().__init__(**kwargs)
 
@@ -47,7 +57,7 @@ class Ingredient(BaseModel):
         return cls.get_or_none(cls.name == name) is not None
 
     def dump(self) -> dict:
-        dump_ = dict(name=self.name, unit=self.unit)
+        dump_ = dict(name=self.name, unit=str(self.unit))
         if self.price is not None:
             dump_["price"] = self.price
         return dump_
@@ -76,6 +86,22 @@ class Recipe(BaseModel):
                 f"- {item.quantity} {item.ingredient.unit} {item.ingredient.name}"
             )
         return "\n".join(description_)
+
+    @classmethod
+    def from_file(cls,path):
+        logger.debug(f"loading recipe {str(path)!r}")
+        name, header, items, instructions = parse_recipe_file(path)
+        recipe = cls(
+            name=name, serves=header["serves"], instructions=instructions
+        )
+        # for quantity,name in items:
+
+        #     item=RecipeItem.(line)
+        #     recipe.add_item(item)
+        return recipe
+
+    def add_item(self,item):
+        item.recipe=self
 
     @classmethod
     def exists(cls, name) -> bool:
@@ -115,25 +141,26 @@ class RecipeItem(BaseModel):
     ingredient = peewee.ForeignKeyField(Ingredient)
     quantity = peewee.FloatField()
 
-    def __repr__(self) -> str:
-        return f"Item({self.quantity},{self.ingredient}({self.ingredient.unit}))"
 
     def __str__(self) -> str:
-        return f"{self.quantity}{self.ingredient.unit} {self.ingredient.name}"
+        return f"{self.quantity} {self.ingredient.unit} {self.ingredient.name}"
 
     @classmethod
-    def create_item_from_line(cls, line, recipe):
-        name, number, unit = cls.parse_item_line(line)
-
-        number, unit = cls.normalize(number, unit)
-        ingredient, created = Ingredient.get_or_create(name=name, unit=unit)
-        if created:
-            logger.debug("Ingredient has been created")
+    def from_tuple(cls,quantity,name) -> Self:
+        if (
+            ingredient := Ingredient.select()
+            .where(Ingredient.name == name, Ingredient.unit == str(quantity.unit))
+            .get_or_none()
+        ):
+            logger.debug("ingredient found in database")
         else:
-            logger.debug("Ingredient already exist")
-        item = cls.create(ingredient=ingredient, quantity=number, recipe=recipe)
-        logger.debug(f"created item: {item}")
+            ingredient = Ingredient(name=name, unit=quantity.unit)
+            logger.debug(f"new ingredient created: {ingredient}")
+        item = RecipeItem(ingredient=ingredient, quantity=quantity.number)
+        logger.debug(f"recipe item created: {item}")
         return item
+
+
 
 
 class Project(BaseModel):
@@ -143,10 +170,10 @@ class Project(BaseModel):
     servings = peewee.IntegerField()
 
     def __str__(self) -> str:
-        return f"{self.id}:{self.name!r}:{self.servings} servings"
+        return f"{self.name}: {funcy.ilen(self.recipes)} recipes for {self.servings} servings"
 
     def __repr__(self) -> str:
-        return f"Project({self.__str__()})"
+        return f"Project(name={self.name},servings={self.servings})"
 
     @property
     def recipes(self):

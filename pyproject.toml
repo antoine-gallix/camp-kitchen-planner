@@ -7,16 +7,18 @@ readme = "README.md"
 packages = [{ include = "planner" }]
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.12"
+python = ">=3.12,<4.0"
 peewee = "^3.16.2"
 prettytable = "^3.8.0"
 dynaconf = "^3.1.12"
 loguru = "^0.7.0"
 python-statemachine = "^2.1.0"
-textual = { extras = ["dev"], version = "^0.27.0" }
 pyyaml = "^6.0"
 funcy = "^2.0"
 pytest = "^7.3.2"
+rich = "^13.7.1"
+click = "^8.1.7"
+textual = "^0.66.0"
 
 [tool.poetry.scripts]
 planner = "cli:main"

@@ -3,7 +3,7 @@ import peewee
 from rich import print
 from rich.text import Text
 
-from planner import app, config, db, explore, loader, models
+from planner import app, config, db, explore, models, parse
 
 
 def print_success(text):
@@ -12,6 +12,7 @@ def print_success(text):
 def print_error(text):
     print(Text(text,style="red"))
 
+# --------------------------------------------------
 
 main = click.Group()
 
@@ -26,9 +27,9 @@ def config_() -> None:
 @click.option("--csv", is_flag=True)
 def compute(project, csv) -> None:
     models.create_tables()
-    loader.load_ingredients_from_file("ingredients.yaml")
-    loader.load_recipe_dir("recipes")
-    project = loader.load_project_file(project)
+    parse.load_ingredients_from_file("ingredients.yaml")
+    parse.load_recipe_dir("recipes")
+    project = parse.load_project_file(project)
     if csv is True:
         project.print_csv_shopping_list()
     else:
@@ -42,7 +43,7 @@ def compute(project, csv) -> None:
 @click.argument("servings", type=click.FLOAT)
 def rescale(recipe, servings) -> None:
     models.create_tables()
-    recipe = loader.load_recipe_file(recipe)
+    recipe = parse.load_recipe_file(recipe)
     rescaled = recipe.rescale(servings)
     print(rescaled.full())
 
@@ -50,8 +51,8 @@ def rescale(recipe, servings) -> None:
 @main.command()
 def dump_ingredient_from_recipes() -> None:
     models.create_tables()
-    loader.load_recipe_dir("recipes/")
-    loader.dump_ingredients("ingredients.yaml")
+    parse.load_recipe_dir("recipes/")
+    parse.dump_ingredients("ingredients.yaml")
 
 
 @main.command()
@@ -62,7 +63,7 @@ def list_recipe() -> None:
 @main.command()
 @click.argument("file", type=click.Path(exists=True, readable=True))
 def load_recipe_file(file) -> None:
-    loader.load_recipe_file(file)
+    parse.load_recipe_file(file)
 
 
 
