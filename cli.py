@@ -1,8 +1,17 @@
 import click
 import peewee
 from rich import print
+from rich.text import Text
 
 from planner import app, config, db, explore, loader, models
+
+
+def print_success(text):
+    print(Text(text,style="green"))
+
+def print_error(text):
+    print(Text(text,style="red"))
+
 
 main = click.Group()
 
@@ -116,6 +125,7 @@ main.add_command(project)
 @click.argument("servings",type=click.INT)
 def create_project(name,servings):
     models.Project.create(name=name,servings=servings)
+    print_success("project created")
 
 @project.command("list")
 def list_projects() -> None:
@@ -142,10 +152,10 @@ def delete_project(name) -> None:
     try:
         project=models.Project.get(name=name)
     except peewee.DoesNotExist:
-        print(f"no project named {name}")
+        print_error(f"no project named {name}")
         return
     project.delete_instance()
-    print(f"project deleted: {project.name}")
+    print_success(f"project deleted: {project.name}")
 
 
 
