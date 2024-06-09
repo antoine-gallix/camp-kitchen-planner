@@ -143,7 +143,7 @@ class Project(BaseModel):
     servings = peewee.IntegerField()
 
     def __str__(self) -> str:
-        return f"{self.name} for {self.servings} persons"
+        return f"{self.id}:{self.name!r}:{self.servings} servings"
 
     def __repr__(self) -> str:
         return f"Project({self.__str__()})"

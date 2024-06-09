@@ -1,4 +1,6 @@
+import peewee
 from peewee import SQL, fn
+
 import planner
 
 
@@ -12,9 +14,9 @@ def count_instances(model) -> int:
 
 def print_instances(model):
     """Print a list of instances"""
-    if instances := model.select().get_or_none():
-        print(f"-- {model.__name__} --")
+    if instances:= model.select():
+        print(f"-- {model.__name__} [{len(instances)}] --")
         for instance in instances:
-            print(instance)
+            print(f"- {instance}")
     else:
-        print(f"no instances of {model.__name__} in database")
+        print(f"no {model.__name__} in the database")

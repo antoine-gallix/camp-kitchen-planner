@@ -1,12 +1,8 @@
 import click
-
-from planner import config
-from planner import loader
-from planner import explore
-from planner import models
-from planner import app
+import peewee
 from rich import print
-from planner import db
+
+from planner import app, config, db, explore, loader, models
 
 main = click.Group()
 
@@ -60,9 +56,6 @@ def load_recipe_file(file) -> None:
     loader.load_recipe_file(file)
 
 
-@main.command()
-def list_project() -> None:
-    explore.print_instances(models.Recipe)
 
 
 @main.command()
@@ -81,9 +74,38 @@ def db_summary() -> None:
         print(f"{model.__name__} : {explore.count_instances(model)}")
 
 
-@main.command()
-def run() -> None:
+@main.command("UI")
+def start_ui() -> None:
     app.MyApp().run()
+
+
+# ------------------------- recipe -------------------------
+
+
+
+# ------------------------- project -------------------------
+
+@main.command()
+@click.argument("name",type=click.STRING)
+@click.argument("servings",type=click.INT)
+def create_project(name,servings):
+    models.Project.create(name=name,servings=servings)
+
+@main.command()
+def list_projects() -> None:
+    explore.print_instances(models.Project)
+
+@main.command()
+@click.argument("name",type=click.STRING)
+def delete_project(name) -> None:
+    try:
+        project=models.Project.get(name=name)
+    except peewee.DoesNotExist:
+        print(f"no project named {name}")
+        return
+    project.delete_instance()
+    print(f"project deleted: {project.name}")
+
 
 
 if __name__ == "__main__":
