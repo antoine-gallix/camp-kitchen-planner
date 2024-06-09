@@ -9,7 +9,8 @@ from rich import print
 
 from planner import logger
 from planner.config import config
-from planner.database import db
+from planner.database import DB
+from planner.errors import QueryError
 from planner.parse import Unit, parse_recipe_file
 
 
@@ -19,16 +20,16 @@ def normalize_string(string):
 
 class BaseModel(peewee.Model):
     class Meta:
-        database = db
+        database = DB()
 
 
 class UnitField(peewee.CharField):
-
-    def db_value(self, unit:Unit):
+    def db_value(self, unit: Unit):
         return str(unit)
 
     def python_value(self, value):
         return Unit(value)
+
 
 class Ingredient(BaseModel):
     """Ingredient to be used in recipes. Have a fixed unit of count and price"""
@@ -41,8 +42,8 @@ class Ingredient(BaseModel):
         indexes = [(("name", "unit"), True)]
 
     def __init__(self, **kwargs) -> None:
-        if not isinstance(unit:=kwargs["unit"],Unit):
-            kwargs["unit"]=Unit(unit)
+        if not isinstance(unit := kwargs["unit"], Unit):
+            kwargs["unit"] = Unit(unit)
         kwargs["name"] = normalize_string(kwargs["name"])
         super().__init__(**kwargs)
 
@@ -88,20 +89,18 @@ class Recipe(BaseModel):
         return "\n".join(description_)
 
     @classmethod
-    def from_file(cls,path):
+    def from_file(cls, path):
         logger.debug(f"loading recipe {str(path)!r}")
         name, header, items, instructions = parse_recipe_file(path)
-        recipe = cls(
-            name=name, serves=header["serves"], instructions=instructions
-        )
+        recipe = cls(name=name, serves=header["serves"], instructions=instructions)
         # for quantity,name in items:
 
         #     item=RecipeItem.(line)
         #     recipe.add_item(item)
         return recipe
 
-    def add_item(self,item):
-        item.recipe=self
+    def add_item(self, item):
+        item.recipe = self
 
     @classmethod
     def exists(cls, name) -> bool:
@@ -112,7 +111,7 @@ class Recipe(BaseModel):
         lines.append(f"serves: {self.serves}")
         lines.append("---")
         for item in self.items:
-            lines.append(f"- {item.quantity}{item.ingredient.unit} {item.ingredient}")
+            lines.append(f"- {item.quantity} {item.ingredient.unit} {item.ingredient}")
         if self.instructions is not None:
             lines.append("---")
             lines.append(self.instructions)
@@ -121,7 +120,7 @@ class Recipe(BaseModel):
 
     def rescale(self, servings):
         rescaled = Recipe.create(
-            name=f"{self.name} rescaled",
+            name=f"{self.name} rescaled for {servings}",
             serves=servings,
             instructions=self.instructions,
         )
@@ -141,12 +140,11 @@ class RecipeItem(BaseModel):
     ingredient = peewee.ForeignKeyField(Ingredient)
     quantity = peewee.FloatField()
 
-
     def __str__(self) -> str:
         return f"{self.quantity} {self.ingredient.unit} {self.ingredient.name}"
 
     @classmethod
-    def from_tuple(cls,quantity,name) -> Self:
+    def from_tuple(cls, quantity, name) -> Self:
         if (
             ingredient := Ingredient.select()
             .where(Ingredient.name == name, Ingredient.unit == str(quantity.unit))
@@ -159,8 +157,6 @@ class RecipeItem(BaseModel):
         item = RecipeItem(ingredient=ingredient, quantity=quantity.number)
         logger.debug(f"recipe item created: {item}")
         return item
-
-
 
 
 class Project(BaseModel):
@@ -184,11 +180,13 @@ class Project(BaseModel):
         projects = cls.select()
         match len(projects):
             case 0:
-                QueryError('no projects in the database')
+                QueryError("no projects in the database")
             case 1:
                 return projects[0]
             case _:
-                QueryError(f'{len(projects)} project in the database. could not determine default')
+                QueryError(
+                    f"{len(projects)} project in the database. could not determine default"
+                )
 
     def shopping_list(self):
         shopping_list = defaultdict(float)
@@ -197,7 +195,7 @@ class Project(BaseModel):
                 shopping_list[item.ingredient] += (
                     item.quantity * self.servings / recipe.serves
                 )
-        return shopping_list
+        return funcy.lmap(tuple, shopping_list.items())
 
     def priced_shopping_list(self):
         shopping_list = self.shopping_list()
@@ -207,7 +205,7 @@ class Project(BaseModel):
                 quantity,
                 ingredient.price * quantity if ingredient.price is not None else None,
             )
-            for ingredient, quantity in shopping_list.items()
+            for ingredient, quantity in shopping_list
         ]
         return priced_shopping_list
 
@@ -281,17 +279,17 @@ class ProjectItem(BaseModel):
 # All model classes
 all_models = [Ingredient, Recipe, RecipeItem, Project, ProjectItem]
 # Entity models
-all_models = [Ingredient, Recipe, Project]
+entity_models = [Ingredient, Recipe, Project]
 
 
 def create_tables() -> None:
     """Create tables, if they don't exist"""
     logger.debug("creating tables")
-    db.create_tables(all_models)
+    DB().create_tables(all_models)
 
 
 def reset_tables() -> None:
     """Destructive reset"""
     logger.debug("reseting tables")
-    db.drop_tables(all_models)
-    db.create_tables(all_models)
+    DB().drop_tables(all_models)
+    DB().create_tables(all_models)

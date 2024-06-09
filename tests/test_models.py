@@ -11,7 +11,7 @@ def rollback_transaction_here(rollback_transaction): ...
 
 @fixture
 def pan():
-    return models.Ingredient.create(name="pan", unit=Unit.KILOGRAM, price=1.5)
+    return models.Ingredient.create(name="pan", unit=Unit.UNIT, price=1.5)
 
 
 @fixture
@@ -32,7 +32,7 @@ def vinagre():
 @fixture
 def pan_con_tomate(pan, tomate):
     recipe = models.Recipe.create(name="pan con tomate", serves=1)
-    models.RecipeItem.create(recipe=recipe, ingredient=tomate, quantity=100)
+    models.RecipeItem.create(recipe=recipe, ingredient=tomate, quantity=0.1)
     models.RecipeItem.create(recipe=recipe, ingredient=pan, quantity=1)
     return recipe
 
@@ -51,13 +51,6 @@ def feast(pan_con_tomate, caracoles_con_vinagre):
     models.ProjectItem.create(recipe=pan_con_tomate, project=feast)
     models.ProjectItem.create(recipe=caracoles_con_vinagre, project=feast)
     return feast
-
-def test__pan_con_tomate(pan,tomate):
-    recipe = models.Recipe.create(name="pan con tomate", serves=1)
-    models.RecipeItem.create(recipe=recipe, ingredient=tomate, quantity=100)
-    models.RecipeItem.create(recipe=recipe, ingredient=pan, quantity=1)
-    breakpoint()
-
 
 
 # ------------------------- Ingredient -------------------------
@@ -183,23 +176,35 @@ def test__Recipe__str():
 
 
 def test__Recipe__full__no_instructions(pan_con_tomate):
-    assert pan_con_tomate.full() == "serves: 1\n---\n- 0.1kg tomate\n- 1.0unit pan"
+    assert pan_con_tomate.full().split("\n") == [
+        "serves: 1",
+        "---",
+        "- 0.1 kilogram tomate",
+        "- 1.0 unit pan",
+    ]
 
 
 def test__Recipe__full__with_instructions(pan_con_tomate):
     pan_con_tomate.instructions = "grate the tomate\nput on top of the bread"
-    assert (
-        pan_con_tomate.full()
-        == "serves: 1\n---\n- 0.1kg tomate\n- 1.0unit pan\n---\ngrate the tomate\nput"
-        " on top of the bread"
-    )
+    assert pan_con_tomate.full().split("\n") == [
+        "serves: 1",
+        "---",
+        "- 0.1 kilogram tomate",
+        "- 1.0 unit pan",
+        "---",
+        "grate the tomate",
+        "put on top of the bread",
+    ]
 
 
 def test__Recipe__full__rescale(pan_con_tomate):
     rescaled = pan_con_tomate.rescale(5)
-    assert rescaled.name == "pan con tomate rescaled"
+    assert rescaled.name == "pan con tomate rescaled for 5"
     assert rescaled.serves == 5
-    assert [str(item) for item in rescaled.items] == ["0.5kg tomate", "5.0unit pan"]
+    assert [str(item) for item in rescaled.items] == [
+        "0.5 kilogram tomate",
+        "5.0 unit pan",
+    ]
 
 
 # from file
@@ -207,10 +212,12 @@ def test__Recipe__full__rescale(pan_con_tomate):
 PAN_CON_TOMATE_RECIPE_FILE = "tests/data/pan con tomate"
 BOCATA_DE_NADA_RECIPE = "tests/data/bocata de nada"
 
+
 def test__Recipe__from_file():
-    recipe=models.Recipe.from_file(PAN_CON_TOMATE_RECIPE_FILE)
-    assert recipe.name == ''
-    assert recipe.serves == 0
+    recipe = models.Recipe.from_file(PAN_CON_TOMATE_RECIPE_FILE)
+    assert recipe.name == "pan con tomate"
+    assert recipe.serves == 2
+
 
 # ------------------------- Project -------------------------
 
@@ -222,6 +229,7 @@ def test__Project__create_empty():
 def test__Project__repr(feast):
     assert repr(feast) == "Project(name=feast,servings=5)"
 
+
 def test__Project__str(feast):
     assert str(feast) == "feast: 2 recipes for 5 servings"
 
@@ -232,24 +240,23 @@ def test__Project__create_filled(pan_con_tomate, caracoles_con_vinagre):
     models.ProjectItem.create(recipe=caracoles_con_vinagre, project=feast)
 
 
-def test__Project__shopping_list(feast):
+def test__Project__shopping_list(feast, pan, tomate, caracoles, vinagre):
     shopping_list = feast.shopping_list()
-    assert [
-        f"{quantity}{ingredient.unit} {ingredient.name}"
-        for ingredient, quantity in shopping_list.items()
-    ] == ["0.5kg tomate", "5.0unit pan", "0.25kg caracoles", "1.25l vinagre"]
+    assert shopping_list == [
+        (tomate, 0.5),
+        (pan, 5),
+        (caracoles, 250),
+        (vinagre, 1.25),
+    ]
 
 
-def test__Project__priced_shopping_list(feast):
+def test__Project__priced_shopping_list(feast, pan, tomate, caracoles, vinagre):
     priced_shopping_list = feast.priced_shopping_list()
-    assert [
-        f"{quantity}{ingredient.unit} {ingredient.name}: {price} euros"
-        for ingredient, quantity, price in priced_shopping_list
-    ] == [
-        "0.5kg tomate: 1.5 euros",
-        "5.0unit pan: 7.5 euros",
-        "0.25kg caracoles: 3.0 euros",
-        "1.25l vinagre: 3.125 euros",
+    assert priced_shopping_list == [
+        (tomate, 0.5, 1.5),
+        (pan, 5, 7.5),
+        (caracoles, 250, 3000),
+        (vinagre, 1.25, 3.125),
     ]
 
 
@@ -279,4 +286,3 @@ def test__Project__priced_shopping_list(feast):
 # load_ingredients_from_file
 # make a ingredient yaml file, and load it
 # test atomicity
-
