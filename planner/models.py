@@ -152,6 +152,17 @@ class Project(BaseModel):
     def recipes(self):
         return (dish.recipe for dish in self.dishes)
 
+    @classmethod
+    def get_default(cls):
+        projects = cls.select()
+        match len(projects):
+            case 0:
+                QueryError('no projects in the database')
+            case 1:
+                return projects[0]
+            case _:
+                QueryError(f'{len(projects)} project in the database. could not determine default')
+
     def shopping_list(self):
         shopping_list = defaultdict(float)
         for recipe in self.recipes:
