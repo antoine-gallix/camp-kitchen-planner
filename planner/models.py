@@ -40,6 +40,8 @@ class Ingredient(BaseModel):
         if not isinstance(unit := kwargs["unit"], Unit):
             kwargs["unit"] = Unit(unit)
         kwargs["name"] = normalize_string(kwargs["name"])
+        if not kwargs["name"]:
+            raise ValueError(f'error with ingredient name: {kwargs["name"]}')
         super().__init__(**kwargs)
 
     def __str__(self) -> str:
