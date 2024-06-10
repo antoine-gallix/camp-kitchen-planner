@@ -214,7 +214,7 @@ BOCATA_DE_NADA_RECIPE = "tests/data/bocata de nada"
 
 
 def test__Recipe__from_file():
-    recipe = models.Recipe.from_file(PAN_CON_TOMATE_RECIPE_FILE)
+    recipe = models.Recipe.create_from_file(PAN_CON_TOMATE_RECIPE_FILE)
     assert recipe.name == "pan con tomate"
     assert recipe.serves == 2
 

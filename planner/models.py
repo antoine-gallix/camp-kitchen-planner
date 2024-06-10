@@ -80,7 +80,7 @@ class Recipe(BaseModel):
         return f"{self.name} ({self.serves} persons)"
 
     @property
-    def description(self) -> str:
+    def item_section(self) -> str:
         description_ = [str(self)]
         for item in getattr(self, "items"):
             description_.append(
@@ -89,14 +89,14 @@ class Recipe(BaseModel):
         return "\n".join(description_)
 
     @classmethod
-    def from_file(cls, path):
+    def create_from_file(cls, path):
         logger.debug(f"loading recipe {str(path)!r}")
         name, header, items, instructions = parse_recipe_file(path)
-        recipe = cls(name=name, serves=header["serves"], instructions=instructions)
-        # for quantity,name in items:
-
-        #     item=RecipeItem.(line)
-        #     recipe.add_item(item)
+        recipe = Recipe.create(
+            name=name, serves=header["serves"], instructions=instructions
+        )
+        for quantity, name in items:
+            RecipeItem.create_from_tuple(recipe, quantity, name)
         return recipe
 
     def add_item(self, item):
@@ -144,17 +144,17 @@ class RecipeItem(BaseModel):
         return f"{self.quantity} {self.ingredient.unit} {self.ingredient.name}"
 
     @classmethod
-    def from_tuple(cls, quantity, name) -> Self:
-        if (
-            ingredient := Ingredient.select()
-            .where(Ingredient.name == name, Ingredient.unit == str(quantity.unit))
-            .get_or_none()
-        ):
-            logger.debug("ingredient found in database")
-        else:
-            ingredient = Ingredient(name=name, unit=quantity.unit)
+    def create_from_tuple(cls, recipe, quantity, name) -> Self:
+        ingredient, created = Ingredient.get_or_create(
+            name=name, unit=str(quantity.unit)
+        )
+        if created:
             logger.debug(f"new ingredient created: {ingredient}")
-        item = RecipeItem(ingredient=ingredient, quantity=quantity.number)
+        else:
+            logger.debug("ingredient found in database")
+        item = RecipeItem.create(
+            ingredient=ingredient, quantity=quantity.number, recipe=recipe
+        )
         logger.debug(f"recipe item created: {item}")
         return item
 

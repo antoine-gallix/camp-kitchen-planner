@@ -3,14 +3,16 @@ import peewee
 from rich import print
 from rich.text import Text
 
-from planner import app, config, db, explore, models, parse
+from planner import app, config, explore, models, parse
 
 
 def print_success(text):
-    print(Text(text,style="green"))
+    print(Text(text, style="green"))
+
 
 def print_error(text):
-    print(Text(text,style="red"))
+    print(Text(text, style="red"))
+
 
 # --------------------------------------------------
 
@@ -66,8 +68,6 @@ def load_recipe_file(file) -> None:
     parse.load_recipe_file(file)
 
 
-
-
 @main.command()
 def list_ingredient() -> None:
     explore.print_instances(models.Ingredient)
@@ -92,41 +92,50 @@ def start_ui() -> None:
 # ------------------------- recipe -------------------------
 
 
-recipe = click.Group('recipe')
+recipe = click.Group("recipe")
 main.add_command(recipe)
 
+
 @recipe.command("parse")
-@click.argument("file",type=click.Path(exists=True,dir_okay=False,readable=True,resolve_path=True))
+@click.argument(
+    "file",
+    type=click.Path(exists=True, dir_okay=False, readable=True, resolve_path=True),
+)
 def parse_recipe(file):
-    recipe=models.Recipe.from_file(file)
+    recipe = models.Recipe.create_from_file(file)
     print(recipe)
 
+
 @recipe.command("add")
-@click.argument("file",type=click.Path(exists=True,dir_okay=False,readable=True,resolve_path=True))
+@click.argument(
+    "file",
+    type=click.Path(exists=True, dir_okay=False, readable=True, resolve_path=True),
+)
 def add_recipe(file):
     project = models.Project.get_default()
     print(f"adding recipe to project {project.name}: {file}")
-    recipe=models.Recipe.from_file(file)
+    recipe = models.Recipe.create_from_file(file)
     print(recipe)
 
-@recipe.command("delete")
-@click.argument("id",type=click.INT)
-def delete_recipe(id) -> None:
-    ...
 
+@recipe.command("delete")
+@click.argument("id", type=click.INT)
+def delete_recipe(id) -> None: ...
 
 
 # ------------------------- project -------------------------
 
-project = click.Group('project')
+project = click.Group("project")
 main.add_command(project)
 
+
 @project.command("create")
-@click.argument("name",type=click.STRING)
-@click.argument("servings",type=click.INT)
-def create_project(name,servings):
-    models.Project.create(name=name,servings=servings)
+@click.argument("name", type=click.STRING)
+@click.argument("servings", type=click.INT)
+def create_project(name, servings):
+    models.Project.create(name=name, servings=servings)
     print_success("project created")
+
 
 @project.command("list")
 def list_projects() -> None:
@@ -134,31 +143,30 @@ def list_projects() -> None:
 
 
 @project.command("show")
-@click.option("--name",type=click.STRING,default=None)
+@click.option("--name", type=click.STRING, default=None)
 def show_project(name) -> None:
     if name is not None:
         try:
-            project=models.Project.get(name=name)
+            project = models.Project.get(name=name)
         except peewee.DoesNotExist:
             print(f"no project named {name}")
             return
     else:
-        print('default project')
-        project=models.Project.get_default()
+        print("default project")
+        project = models.Project.get_default()
     print(project)
 
+
 @project.command("delete")
-@click.argument("name",type=click.STRING)
+@click.argument("name", type=click.STRING)
 def delete_project(name) -> None:
     try:
-        project=models.Project.get(name=name)
+        project = models.Project.get(name=name)
     except peewee.DoesNotExist:
         print_error(f"no project named {name}")
         return
     project.delete_instance()
     print_success(f"project deleted: {project.name}")
-
-
 
 
 if __name__ == "__main__":
