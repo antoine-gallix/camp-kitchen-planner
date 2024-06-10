@@ -58,11 +58,6 @@ def load_recipe_file(file) -> None:
     parse.load_recipe_file(file)
 
 
-@main.command()
-def list_ingredient() -> None:
-    explore.print_instances(models.Ingredient)
-
-
 @main.command("UI")
 def start_ui() -> None:
     app.MyApp().run()
@@ -198,6 +193,36 @@ def reset_db() -> None:
 def db_summary() -> None:
     for model in [models.Project, models.Recipe, models.Ingredient]:
         print(f"{model.__name__} : {explore.count_instances(model)}")
+
+
+# ------------------------- ingredient -------------------------
+
+ingredient = click.Group("ingredient")
+main.add_command(ingredient)
+
+
+@ingredient.command("list")
+def list_ingredient() -> None:
+    from rich.table import Table
+
+    table = Table(title="Ingredients in database")
+
+    table.add_column("ID")
+    table.add_column("Name")
+    table.add_column("Unit")
+    if instances := models.Ingredient.select():
+        for instance in instances:
+            table.add_row(str(instance.id), instance.name, instance.unit)
+    else:
+        print(f"no {models.Ingredient.__name__} in the database")
+    print(table)
+
+
+@ingredient.command("show")
+@click.argument("id", type=click.INT)
+def show_ingredient(id) -> None:
+    instance = models.Ingredient.get_by_id(id)
+    print(instance.dump())
 
 
 if __name__ == "__main__":
