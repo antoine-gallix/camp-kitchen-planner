@@ -8,14 +8,9 @@ from prettytable import PrettyTable
 from rich import print
 
 from planner import logger
-from planner.config import config
 from planner.database import DB
 from planner.errors import QueryError
-from planner.parse import Unit, parse_recipe_file
-
-
-def normalize_string(string):
-    return re.sub("\s{2,}", " ", string.lower().strip())
+from planner.parse import Unit, normalize_string, parse_recipe_file
 
 
 class BaseModel(peewee.Model):
@@ -90,13 +85,18 @@ class Recipe(BaseModel):
 
     @classmethod
     def create_from_file(cls, path):
-        logger.debug(f"loading recipe {str(path)!r}")
+        logger.debug(f"loading file: {str(path)!r}")
         name, header, items, instructions = parse_recipe_file(path)
-        recipe = Recipe.create(
-            name=name, serves=header["serves"], instructions=instructions
-        )
-        for quantity, name in items:
-            RecipeItem.create_from_tuple(recipe, quantity, name)
+        if Recipe.get_or_none(name=name) is not None:
+            logger.info(f"recipe already exist: {name}")
+            return
+        with DB().atomic():
+            recipe = Recipe.create(
+                name=name, serves=header["serves"], instructions=instructions
+            )
+            for quantity, name in items:
+                RecipeItem.create_from_tuple(recipe, quantity, name)
+        logger.info(f"recipe created: {recipe.name}")
         return recipe
 
     def add_item(self, item):

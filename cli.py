@@ -1,9 +1,14 @@
+from pathlib import Path
+
 import click
 import peewee
+from peewee import DatabaseError
 from rich import print
 from rich.text import Text
 
 from planner import app, config, explore, models, parse
+from planner.database import DB
+from planner.errors import ParsingError
 
 
 def print_success(text):
@@ -41,25 +46,10 @@ def compute(project, csv) -> None:
 
 
 @main.command()
-@click.argument("recipe")
-@click.argument("servings", type=click.FLOAT)
-def rescale(recipe, servings) -> None:
-    models.create_tables()
-    recipe = parse.load_recipe_file(recipe)
-    rescaled = recipe.rescale(servings)
-    print(rescaled.full())
-
-
-@main.command()
 def dump_ingredient_from_recipes() -> None:
     models.create_tables()
     parse.load_recipe_dir("recipes/")
     parse.dump_ingredients("ingredients.yaml")
-
-
-@main.command()
-def list_recipe() -> None:
-    explore.print_instances(models.Project)
 
 
 @main.command()
@@ -71,17 +61,6 @@ def load_recipe_file(file) -> None:
 @main.command()
 def list_ingredient() -> None:
     explore.print_instances(models.Ingredient)
-
-
-@main.command()
-def reset_db() -> None:
-    models.reset_tables()
-
-
-@main.command()
-def db_summary() -> None:
-    for model in [models.Project, models.Recipe, models.Ingredient]:
-        print(f"{model.__name__} : {explore.count_instances(model)}")
 
 
 @main.command("UI")
@@ -96,26 +75,38 @@ recipe = click.Group("recipe")
 main.add_command(recipe)
 
 
-@recipe.command("parse")
-@click.argument(
-    "file",
-    type=click.Path(exists=True, dir_okay=False, readable=True, resolve_path=True),
-)
-def parse_recipe(file):
-    recipe = models.Recipe.create_from_file(file)
-    print(recipe)
+@recipe.command("list")
+def list_recipe() -> None:
+    explore.print_instances(models.Recipe)
 
 
-@recipe.command("add")
+@recipe.command("load")
 @click.argument(
     "file",
-    type=click.Path(exists=True, dir_okay=False, readable=True, resolve_path=True),
+    type=click.Path(exists=True, readable=True, resolve_path=True),
 )
-def add_recipe(file):
-    project = models.Project.get_default()
-    print(f"adding recipe to project {project.name}: {file}")
-    recipe = models.Recipe.create_from_file(file)
-    print(recipe)
+def load_recipe(file):
+    try:
+        if (path := Path(file)).is_file():
+            models.Recipe.create_from_file(path)
+        else:
+            print(f"loading recipes from directory: {path}")
+            with DB().atomic():
+                for file in path.iterdir():
+                    models.Recipe.create_from_file(file)
+    except ParsingError as exc:
+        print_error(f"error during parsing. operation canceled: {exc}")
+    except DatabaseError as exc:
+        print_error(f"error from database during loading. operation canceled: {exc}")
+
+
+@recipe.command("rescale")
+@click.argument("recipe", type=click.STRING)
+@click.argument("servings", type=click.FLOAT)
+def rescale_recipe(recipe, servings) -> None:
+    recipe = models.Recipe.get(name=recipe)
+    rescaled = recipe.rescale(servings)
+    print(rescaled.full())
 
 
 @recipe.command("delete")
@@ -167,6 +158,46 @@ def delete_project(name) -> None:
         return
     project.delete_instance()
     print_success(f"project deleted: {project.name}")
+
+
+@project.command("add")
+@click.option(
+    "--file",
+    type=click.Path(exists=True, dir_okay=False, readable=True, resolve_path=True),
+)
+@click.option(
+    "--name",
+    type=click.STRING,
+)
+def add_recipe(file, name):
+    "add recipe file to default project"
+    project = models.Project.get_default()
+    if name is not None:
+        recipe = models.Recipe.get(name=name)
+        print(f"recipe fetched from database: {recipe}")
+    elif file is not None:
+        recipe = models.Recipe.create_from_file(file)
+        print(f"recipe created from file: {recipe}")
+    models.ProjectItem(project=project, recipe=recipe)
+    print(f"recipe added to project {project.name}: {recipe.name}")
+
+
+# ------------------------- recipe -------------------------
+
+
+db = click.Group("db")
+main.add_command(db)
+
+
+@db.command("reset")
+def reset_db() -> None:
+    models.reset_tables()
+
+
+@db.command("show")
+def db_summary() -> None:
+    for model in [models.Project, models.Recipe, models.Ingredient]:
+        print(f"{model.__name__} : {explore.count_instances(model)}")
 
 
 if __name__ == "__main__":
