@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from planner import loader
+from planner import parse
 from planner import models
 from prettytable import PrettyTable
 

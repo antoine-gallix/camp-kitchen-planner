@@ -1,11 +1,11 @@
 from collections import defaultdict
 
-from planner import loader
+from planner import parse
 from planner import models
 
 
 def make_shopping_list(project_file):
-    project = loader.load_yaml_file(project_file)
+    project = parse.load_yaml_file(project_file)
 
     shoppinglist = defaultdict(int)
     for dish in project:
