@@ -218,6 +218,12 @@ def list_ingredient() -> None:
     print(table)
 
 
+@ingredient.command("export")
+@click.option("--file", type=click.Path(writable=True), default="ingredients.yaml")
+def dump_ingredients(file) -> None:
+    parse.dump_ingredients(file)
+
+
 @ingredient.command("show")
 @click.argument("id", type=click.INT)
 def show_ingredient(id) -> None:
