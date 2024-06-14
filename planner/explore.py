@@ -1,5 +1,11 @@
+import peewee
 from rich import print
 from rich.table import Table
+
+
+def count_instances(model) -> int:
+    """Count instances of a model"""
+    return model.select(peewee.fn.COUNT(peewee.SQL("*"))).scalar()
 
 
 def print_instances(model):
