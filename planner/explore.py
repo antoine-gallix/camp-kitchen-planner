@@ -32,5 +32,16 @@ def print_instances_table(model):
     for field in fields:
         table.add_column(field)
     for instance in instances:
-        table.add_row(*tuple(str(getattr(instance, field)) for field in fields))
+        instance_fields = (getattr(instance, field) for field in fields)
+
+        def as_string(field):
+            if isinstance(field, list):
+                if field:
+                    return str([str(item) for item in field])
+                else:
+                    return ""
+            else:
+                return str(field)
+
+        table.add_row(*tuple(as_string(field) for field in instance_fields))
     print(table)

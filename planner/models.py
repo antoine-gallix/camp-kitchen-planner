@@ -45,7 +45,7 @@ class Ingredient(BaseModel):
     unit = UnitField()
     price = peewee.FloatField(null=True)
 
-    _list_fields = ["id", "name", "unit"]
+    _list_fields = ["id", "name", "unit", "tags"]
 
     class Meta:
         indexes = [(("name", "unit"), True)]
@@ -72,7 +72,7 @@ class Ingredient(BaseModel):
 
     @property
     def tags(self):
-        return (
+        return list(
             Tag.select()
             .join(IngredientTag)
             .join(Ingredient)

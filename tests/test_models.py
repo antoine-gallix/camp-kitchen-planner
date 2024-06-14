@@ -178,7 +178,7 @@ def test__Ingredient__unique_name_unit__all_same():
 
 def test__Ingredient__add_tag(tomate, fresh):
     tomate.add_tag(fresh)
-    assert list(tomate.tags) == [fresh]
+    assert tomate.tags == [fresh]
 
 
 def test__Tag__add_to_tag_only_once(tomate, fresh):
