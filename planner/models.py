@@ -33,6 +33,8 @@ class Ingredient(BaseModel):
     unit = UnitField()
     price = peewee.FloatField(null=True)
 
+    _list_fields = ["id", "name", "unit"]
+
     class Meta:
         indexes = [(("name", "unit"), True)]
 
