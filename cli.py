@@ -36,22 +36,6 @@ def db_summary() -> None:
         print(f"{model.__name__} : {explore.count_instances(model)}")
 
 
-@main.command()
-@click.argument("project")
-@click.option("--csv", is_flag=True)
-def compute(project, csv) -> None:
-    models.create_tables()
-    parse.load_ingredients_from_file("ingredients.yaml")
-    parse.load_recipe_dir("recipes")
-    project = parse.load_project_file(project)
-    if csv is True:
-        project.print_csv_shopping_list()
-    else:
-        project.print_summary()
-        print("--- shopping list ---")
-        project.print_shopping_list()
-
-
 @main.command("UI")
 def start_ui() -> None:
     app.MyApp().run()
@@ -69,6 +53,30 @@ def reset_db() -> None:
     models.reset_tables()
 
 
+# ------------------------- ingredient -------------------------
+
+ingredient = click.Group("ingredient")
+main.add_command(ingredient)
+
+
+@ingredient.command("list")
+def list_ingredient() -> None:
+    explore.print_instances_table(models.Ingredient)
+
+
+@ingredient.command("show")
+@click.argument("id", type=click.INT)
+def show_ingredient(id) -> None:
+    instance = models.Ingredient.get_by_id(id)
+    print(instance.dump())
+
+
+@ingredient.command("export")
+@click.option("--file", type=click.Path(writable=True), default="ingredients.yaml")
+def dump_ingredients(file) -> None:
+    parse.dump_ingredients(file)
+
+
 # ------------------------- recipe -------------------------
 
 
@@ -79,7 +87,7 @@ main.add_command(recipe)
 @recipe.command("list")
 def list_recipe() -> None:
     """List recipes"""
-    explore.print_instances(models.Recipe)
+    explore.print_instances_table(models.Recipe)
 
 
 @recipe.command("load")
@@ -195,44 +203,21 @@ def add_recipe(file, name, id):
     elif file is not None:
         recipe = models.Recipe.create_from_file(file)
         print(f"recipe created from file: {recipe}")
-    models.ProjectItem(project=project, recipe=recipe)
-    print(f"recipe added to project {project.name}: {recipe.name}")
+    models.ProjectItem.create(project=project, recipe=recipe)
+    print(f"recipe added to project {project.name!r}: {recipe.name}")
 
 
-# ------------------------- ingredient -------------------------
-
-ingredient = click.Group("ingredient")
-main.add_command(ingredient)
-
-
-@ingredient.command("list")
-def list_ingredient() -> None:
-    from rich.table import Table
-
-    table = Table(title="Ingredients in database")
-
-    table.add_column("ID")
-    table.add_column("Name")
-    table.add_column("Unit")
-    if instances := models.Ingredient.select():
-        for instance in instances:
-            table.add_row(str(instance.id), instance.name, instance.unit)
+@project.command()
+@click.argument("project")
+@click.option("--csv", is_flag=True)
+def shopping_list(project, csv) -> None:
+    project = models.Project.get_default()
+    if csv is True:
+        project.print_csv_shopping_list()
     else:
-        print(f"no {models.Ingredient.__name__} in the database")
-    print(table)
-
-
-@ingredient.command("show")
-@click.argument("id", type=click.INT)
-def show_ingredient(id) -> None:
-    instance = models.Ingredient.get_by_id(id)
-    print(instance.dump())
-
-
-@ingredient.command("export")
-@click.option("--file", type=click.Path(writable=True), default="ingredients.yaml")
-def dump_ingredients(file) -> None:
-    parse.dump_ingredients(file)
+        project.print_summary()
+        print("--- shopping list ---")
+        project.print_shopping_list()
 
 
 if __name__ == "__main__":
