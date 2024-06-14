@@ -9,6 +9,22 @@ from planner.parse import Unit
 def rollback_transaction_here(rollback_transaction): ...
 
 
+# --- tags
+
+
+@fixture
+def fresh():
+    return models.Tag.create(name="fresh")
+
+
+@fixture
+def delicious():
+    return models.Tag.create(name="delicious")
+
+
+# --- ingredients
+
+
 @fixture
 def pan():
     return models.Ingredient.create(name="pan", unit=Unit.UNIT, price=1.5)
@@ -29,6 +45,9 @@ def vinagre():
     return models.Ingredient.create(name="vinagre", unit=Unit.LITER, price=2.5)
 
 
+# --- recipes
+
+
 @fixture
 def pan_con_tomate(pan, tomate):
     recipe = models.Recipe.create(name="pan con tomate", serves=1)
@@ -45,12 +64,37 @@ def caracoles_con_vinagre(caracoles, vinagre):
     return recipe
 
 
+# --- project
+
+
 @fixture
 def feast(pan_con_tomate, caracoles_con_vinagre):
     feast = models.Project.create(name="feast", servings=5)
     models.ProjectItem.create(recipe=pan_con_tomate, project=feast)
     models.ProjectItem.create(recipe=caracoles_con_vinagre, project=feast)
     return feast
+
+
+# ------------------------- tag -------------------------
+
+
+def test__Tag__save():
+    fresh = models.Tag(name="fresh")
+    fresh.save()
+
+
+def test__Tag__unique():
+    models.Tag.create(name="fresh")
+    with raises(peewee.IntegrityError):
+        models.Tag.create(name="fresh")
+
+
+def test__Tag__repr(fresh):
+    assert repr(fresh) == "<Tag('fresh')>"
+
+
+def test__Tag__str(fresh):
+    assert str(fresh) == "fresh"
 
 
 # ------------------------- Ingredient -------------------------
@@ -130,6 +174,30 @@ def test__Ingredient__unique_name_unit__all_same():
     models.Ingredient.create(name="pommes", unit=Unit.KILOGRAM)
     with raises(peewee.IntegrityError):
         models.Ingredient.create(name="pommes", unit=Unit.KILOGRAM)
+
+
+def test__Ingredient__add_tag(tomate, fresh):
+    tomate.add_tag(fresh)
+    assert list(tomate.tags) == [fresh]
+
+
+def test__Tag__add_to_tag_only_once(tomate, fresh):
+    tomate.add_tag(fresh)
+    with raises(peewee.IntegrityError):
+        tomate.add_tag(fresh)
+
+
+def test__Tag__multiple_tag_to_ingredient(tomate, fresh, delicious):
+    tomate.add_tag(fresh)
+    tomate.add_tag(delicious)
+    assert list(tomate.tags) == [fresh, delicious]
+
+
+def test__Tag__to_multiple_ingredients(tomate, caracoles, fresh):
+    tomate.add_tag(fresh)
+    caracoles.add_tag(fresh)
+    assert list(tomate.tags) == [fresh]
+    assert list(caracoles.tags) == [fresh]
 
 
 # ------------------------- Recipe -------------------------

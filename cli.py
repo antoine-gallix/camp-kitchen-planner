@@ -53,6 +53,24 @@ def reset_db() -> None:
     models.reset_tables()
 
 
+# ------------------------- tags -------------------------
+
+tags = click.Group("tags")
+main.add_command(tags)
+
+
+@tags.command("list")
+def list_tags() -> None:
+    explore.print_instances_table(models.Tag)
+
+
+@tags.command("create")
+@click.argument("name", type=click.STRING)
+def create_tag(name) -> None:
+    tag = models.Tag.create(name=name)
+    print_success(f"tag created: {tag!r}")
+
+
 # ------------------------- ingredient -------------------------
 
 ingredient = click.Group("ingredient")

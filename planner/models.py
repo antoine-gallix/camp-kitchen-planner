@@ -26,6 +26,18 @@ class UnitField(peewee.CharField):
         return Unit(value)
 
 
+class Tag(BaseModel):
+    """Classify ingredients."""
+
+    name = peewee.CharField(unique=True)
+
+    def __str__(self) -> str:
+        return str(self.name)
+
+    def __repr__(self) -> str:
+        return f"<Tag({self.name!r})>"
+
+
 class Ingredient(BaseModel):
     """Ingredient to be used in recipes. Have a fixed unit of count and price"""
 
@@ -39,11 +51,10 @@ class Ingredient(BaseModel):
         indexes = [(("name", "unit"), True)]
 
     def __init__(self, **kwargs) -> None:
-        if not isinstance(unit := kwargs["unit"], Unit):
+        if (unit := kwargs.get("unit")) is not None and not isinstance(unit, Unit):
             kwargs["unit"] = Unit(unit)
-        kwargs["name"] = normalize_string(kwargs["name"])
-        if not kwargs["name"]:
-            raise ValueError(f'error with ingredient name: {kwargs["name"]}')
+        if (name := kwargs.get("name")) is not None:
+            kwargs["name"] = normalize_string(name)
         super().__init__(**kwargs)
 
     def __str__(self) -> str:
@@ -56,11 +67,33 @@ class Ingredient(BaseModel):
     def exists(cls, name) -> bool:
         return cls.get_or_none(cls.name == name) is not None
 
+    def add_tag(self, tag: Tag):
+        IngredientTag.create(ingredient=self, tag=tag)
+
+    @property
+    def tags(self):
+        return (
+            Tag.select()
+            .join(IngredientTag)
+            .join(Ingredient)
+            .where(Ingredient.id == self.id)
+        )
+
     def dump(self) -> dict:
         dump_ = dict(name=self.name, unit=str(self.unit))
         if self.price is not None:
             dump_["price"] = self.price
         return dump_
+
+
+class IngredientTag(BaseModel):
+    """Link ingredients to tags"""
+
+    ingredient = peewee.ForeignKeyField(Ingredient)
+    tag = peewee.ForeignKeyField(Tag)
+
+    class Meta:
+        indexes = [(("ingredient", "tag"), True)]
 
 
 class Recipe(BaseModel):
@@ -283,9 +316,9 @@ class ProjectItem(BaseModel):
 
 
 # All model classes
-all_models = [Ingredient, Recipe, RecipeItem, Project, ProjectItem]
+all_models = [Tag, Ingredient, IngredientTag, Recipe, RecipeItem, Project, ProjectItem]
 # Entity models
-entity_models = [Ingredient, Recipe, Project]
+entity_models = [Tag, Ingredient, Recipe, Project]
 
 
 def create_tables() -> None:
