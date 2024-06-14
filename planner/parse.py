@@ -168,13 +168,6 @@ def parse_recipe_file(
     return name, header, items, instructions
 
 
-# def load_recipe_dir(path) -> None:
-#     """Loads all recipe files in a directory"""
-#     logger.info(f"loading recipe directory: {str(path)!r}")
-#     for recipe_file in Path(path).iterdir():
-#         load_recipe_file(recipe_file)
-
-
 # ------------------------- project -------------------------
 
 
