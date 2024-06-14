@@ -68,6 +68,8 @@ class Recipe(BaseModel):
     serves = peewee.IntegerField()
     instructions = peewee.CharField(null=True)
 
+    _list_fields = ["id", "name", "serves"]
+
     def __init__(self, **kwargs) -> None:
         if "name" in kwargs:
             kwargs["name"] = normalize_string(kwargs["name"])
