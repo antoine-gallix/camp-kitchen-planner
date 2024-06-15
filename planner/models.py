@@ -83,6 +83,8 @@ class Ingredient(BaseModel):
         dump_ = dict(name=self.name, unit=str(self.unit))
         if self.price is not None:
             dump_["price"] = self.price
+        if self.tags:
+            dump_["tags"] = [str(tag) for tag in self.tags]
         return dump_
 
 
