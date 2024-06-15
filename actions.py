@@ -1,7 +1,9 @@
 from collections import defaultdict
+from pathlib import Path
 
-from planner import parse
-from planner import models
+from yaml import dump
+
+from planner import logger, models, parse
 
 
 def make_shopping_list(project_file):
@@ -15,3 +17,18 @@ def make_shopping_list(project_file):
                 item.quantity * dish["servings"] / recipe.serves
             )
     return shoppinglist
+
+
+def export_ingredient_base():
+    base_dir = Path("base")
+    base_dir.mkdir(exist_ok=True)
+
+    tags = [tag.name for tag in models.Tag]
+    tag_file = base_dir / "tags"
+    logger.info(f"exporting {len(tags)} tags to {tag_file}")
+    tag_file.write_text(dump(tags))
+
+    ingredients = [ingredient.dump() for ingredient in models.Ingredient]
+    ingredient_file = base_dir / "ingredients"
+    logger.info(f"exporting {len(ingredients)} ingredients to {ingredient_file}")
+    ingredient_file.write_text(dump(ingredients))
