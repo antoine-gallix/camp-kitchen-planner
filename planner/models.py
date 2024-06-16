@@ -252,13 +252,14 @@ class Project(BaseModel):
                 )
             ),
             title=f"Project: {self.name!r}",
+            expand=False,
         )
 
     def shopping_list_table(self):
         table = PrettyTable()
         table.field_names = ["ingredient", "quantity"]
 
-        for ingredient, quantity in self.shopping_list().items():
+        for ingredient, quantity in self.shopping_list():
             table.add_row((ingredient.name, f"{quantity:.1f} {ingredient.unit}"))
         return table
 

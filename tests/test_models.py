@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import peewee
 import pytest
 from pytest import fixture, raises
@@ -284,8 +286,9 @@ def test__Recipe__full__with_instructions(pan_con_tomate):
 
 # from file
 
-PAN_CON_TOMATE_RECIPE_FILE = "tests/data/pan con tomate"
-BOCATA_DE_NADA_RECIPE = "tests/data/bocata de nada"
+TEST_DATA = Path("tests/data")
+PAN_CON_TOMATE_RECIPE_FILE = TEST_DATA / "pan con tomate"
+BOCATA_DE_NADA_RECIPE = TEST_DATA / "bocata de nada"
 
 
 def test__Recipe__from_file():
