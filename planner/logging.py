@@ -14,10 +14,20 @@ def add_terminal_sink():
     """Setup a free text logging sink to stdout"""
     level = config.get("logging_level", default=DEFAULT_LOGGING_LEVEL).upper()
     logger.add(
-        sys.stdout,
+        sys.stderr,
         format="<level>{message}</level>",
         level=level,
         colorize=True,
+    )
+
+
+def add_file_sink():
+    """Setup a free text logging sink to stdout"""
+    level = config.get("logging_level", default=DEFAULT_LOGGING_LEVEL).upper()
+    logger.add(
+        "logs.txt",
+        format="{message}",
+        level=level,
     )
 
 
