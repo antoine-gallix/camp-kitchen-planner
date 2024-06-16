@@ -1,10 +1,9 @@
 from collections import defaultdict
 
-from planner import parse
-from planner import models
+import dialog
 from prettytable import PrettyTable
 
-import dialog
+from planner import models, parse
 
 
 def view_instances(model):
@@ -83,7 +82,7 @@ def create_recipe():
             print("choose an ingredient")
             ingredient = choose_or_create_ingredient()
             quantity = input("which quantity?: ")
-            models.RecipeItem.create(
+            models.IngredientQuantity.create(
                 recipe=recipe, ingredient=ingredient, quantity=quantity
             )
         except EOFError:

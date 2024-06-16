@@ -5,6 +5,9 @@ import funcy
 import peewee
 from prettytable import PrettyTable
 from rich import print
+from rich.console import Group
+from rich.panel import Panel
+from rich.text import Text
 
 from planner import logger
 from planner.database import DB
@@ -135,7 +138,7 @@ class Recipe(BaseModel):
                 name=name, serves=header["serves"], instructions=instructions
             )
             for quantity, name in items:
-                RecipeItem.create_from_tuple(recipe, quantity, name)
+                IngredientQuantity.create_from_tuple(recipe, quantity, name)
         logger.info(f"recipe created: {recipe.name}")
         return recipe
 
@@ -165,7 +168,7 @@ class Recipe(BaseModel):
             instructions=self.instructions,
         )
         for item in self.items:
-            RecipeItem.create(
+            IngredientQuantity.create(
                 recipe=rescaled,
                 ingredient=item.ingredient,
                 quantity=item.quantity * servings / self.serves,
@@ -173,7 +176,7 @@ class Recipe(BaseModel):
         return rescaled
 
 
-class RecipeItem(BaseModel):
+class IngredientQuantity(BaseModel):
     """An item of a recipe. Ingredient and Quantity"""
 
     recipe = peewee.ForeignKeyField(Recipe, backref="items")
@@ -192,7 +195,7 @@ class RecipeItem(BaseModel):
             logger.debug(f"new ingredient created: {ingredient}")
         else:
             logger.debug("ingredient found in database")
-        item = RecipeItem.create(
+        item = IngredientQuantity.create(
             ingredient=ingredient, quantity=quantity.number, recipe=recipe
         )
         logger.debug(f"recipe item created: {item}")
@@ -223,6 +226,9 @@ class Project(BaseModel):
                     f"{len(projects)} project in the database. could not determine default"
                 )
 
+    def add_recipe(self, recipe, servings):
+        ProjectRecipe.create(project=self, recipe=recipe, servings=servings)
+
     # --- compute shopping list
 
     def shopping_list(self):
@@ -250,35 +256,42 @@ class Project(BaseModel):
 
     # --- prints
 
-    def print_summary(self):
-        print(self)
-        for item in self.items:
-            print(f"- {item.name} for {item.servings}")
+    def detail_printable(self):
+        return Panel(
+            Group(
+                *(
+                    Text(f"- {item.recipe.name!r} for {item.servings} persons")
+                    for item in self.items
+                )
+            ),
+            title=f"Project: {self.name!r}",
+        )
 
-    def print_shopping_list(self):
-        t = PrettyTable()
-        t.field_names = ["ingredient", "quantity"]
+    def shopping_list_table(self):
+        table = PrettyTable()
+        table.field_names = ["ingredient", "quantity"]
 
         for ingredient, quantity in self.shopping_list().items():
-            t.add_row((ingredient.name, f"{quantity:.1f} {ingredient.unit}"))
-        print(t)
+            table.add_row((ingredient.name, f"{quantity:.1f} {ingredient.unit}"))
+        return table
 
-    def print_priced_shopping_list(self):
-        t = PrettyTable()
-        t.field_names = [
+    def priced_shopping_list_table(self):
+        table = PrettyTable()
+        table.field_names = [
             "ingredient",
             "quantity",
             "price",
         ]
 
         for ingredient, quantity, price in self.priced_shopping_list():
-            main = f"{ingredient}: {quantity:g}{ingredient.unit}"
             if price is not None:
                 price_str = f"({price} euros)"
             else:
                 price_str = f"(no price data)"
-            t.add_row((ingredient.name, f"{quantity:.1f} {ingredient.unit}", price_str))
-        print(t)
+            table.add_row(
+                (ingredient.name, f"{quantity:.1f} {ingredient.unit}", price_str)
+            )
+        return table
 
     def print_csv_shopping_list(self):
         t = PrettyTable()
@@ -307,7 +320,7 @@ class Project(BaseModel):
                 )
 
 
-class ProjectItem(BaseModel):
+class ProjectRecipe(BaseModel):
     """A dish of a project"""
 
     project = peewee.ForeignKeyField(Project, backref="items")
@@ -319,7 +332,15 @@ class ProjectItem(BaseModel):
 
 
 # All model classes
-all_models = [Tag, Ingredient, IngredientTag, Recipe, RecipeItem, Project, ProjectItem]
+all_models = [
+    Tag,
+    Ingredient,
+    IngredientTag,
+    Recipe,
+    IngredientQuantity,
+    Project,
+    ProjectRecipe,
+]
 # Entity models
 entity_models = [Tag, Ingredient, Recipe, Project]
 

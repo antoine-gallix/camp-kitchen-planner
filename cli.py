@@ -173,9 +173,8 @@ main.add_command(project)
 
 @project.command("create")
 @click.argument("name", type=click.STRING)
-@click.argument("servings", type=click.INT)
-def create_project(name, servings):
-    models.Project.create(name=name, servings=servings)
+def create_project(name):
+    models.Project.create(name=name)
     print_success("project created")
 
 
@@ -194,9 +193,9 @@ def show_project(name) -> None:
             print(f"no project named {name}")
             return
     else:
-        print("default project")
+        print("showing default project")
         project = models.Project.get_default()
-    print(project)
+    print(project.detail_printable())
 
 
 @project.command("delete")
@@ -224,20 +223,23 @@ def delete_project(name) -> None:
     "--id",
     type=click.INT,
 )
-def add_recipe(file, name, id):
-    "add recipe file to default project"
+@click.argument("servings", type=click.INT)
+def add_recipe(file, name, id, servings):
+    "Add recipe file to default project"
     project = models.Project.get_default()
     if id is not None:
         recipe = models.Recipe.get_by_id(id)
         print(f"recipe fetched from database: {recipe}")
-    if name is not None:
+    elif name is not None:
         recipe = models.Recipe.get(name=name)
         print(f"recipe fetched from database: {recipe}")
     elif file is not None:
         recipe = models.Recipe.create_from_file(file)
         print(f"recipe created from file: {recipe}")
-    models.ProjectItem.create(project=project, recipe=recipe)
-    print(f"recipe added to project {project.name!r}: {recipe.name}")
+    else:
+        print_error("could not find recipe")
+    project.add_recipe(recipe=recipe, servings=servings)
+    print(f"recipe added to project {project.name!r}: {recipe.name!r} for {servings}")
 
 
 @project.command()

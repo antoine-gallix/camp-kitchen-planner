@@ -52,16 +52,16 @@ def vinagre():
 @fixture
 def pan_con_tomate(pan, tomate):
     recipe = models.Recipe.create(name="pan con tomate", serves=1)
-    models.RecipeItem.create(recipe=recipe, ingredient=tomate, quantity=0.1)
-    models.RecipeItem.create(recipe=recipe, ingredient=pan, quantity=1)
+    models.IngredientQuantity.create(recipe=recipe, ingredient=tomate, quantity=0.1)
+    models.IngredientQuantity.create(recipe=recipe, ingredient=pan, quantity=1)
     return recipe
 
 
 @fixture
 def caracoles_con_vinagre(caracoles, vinagre):
     recipe = models.Recipe.create(name="caracoles con vinagre", serves=1)
-    models.RecipeItem.create(recipe=recipe, ingredient=caracoles, quantity=50)
-    models.RecipeItem.create(recipe=recipe, ingredient=vinagre, quantity=0.25)
+    models.IngredientQuantity.create(recipe=recipe, ingredient=caracoles, quantity=50)
+    models.IngredientQuantity.create(recipe=recipe, ingredient=vinagre, quantity=0.25)
     return recipe
 
 
@@ -71,8 +71,8 @@ def caracoles_con_vinagre(caracoles, vinagre):
 @fixture
 def feast(pan_con_tomate, caracoles_con_vinagre):
     feast = models.Project.create(name="feast")
-    models.ProjectItem.create(recipe=pan_con_tomate, project=feast, servings=5)
-    models.ProjectItem.create(recipe=caracoles_con_vinagre, project=feast, servings=5)
+    models.ProjectRecipe.create(recipe=pan_con_tomate, project=feast, servings=5)
+    models.ProjectRecipe.create(recipe=caracoles_con_vinagre, project=feast, servings=5)
     return feast
 
 
@@ -305,8 +305,18 @@ def test__Project__str(feast):
 
 def test__Project__create_filled(pan_con_tomate, caracoles_con_vinagre):
     feast = models.Project.create(name="feast")
-    models.ProjectItem.create(recipe=pan_con_tomate, project=feast, servings=5)
-    models.ProjectItem.create(recipe=caracoles_con_vinagre, project=feast, servings=5)
+    models.ProjectRecipe.create(recipe=pan_con_tomate, project=feast, servings=5)
+    models.ProjectRecipe.create(recipe=caracoles_con_vinagre, project=feast, servings=5)
+    assert [(item.recipe.name, item.servings) for item in feast.items] == [
+        ("pan con tomate", 5),
+        ("caracoles con vinagre", 5),
+    ]
+
+
+def test__Project__add_recipe(pan_con_tomate, caracoles_con_vinagre):
+    feast = models.Project.create(name="feast")
+    feast.add_recipe(recipe=pan_con_tomate, servings=5)
+    feast.add_recipe(recipe=caracoles_con_vinagre, servings=5)
     assert [(item.recipe.name, item.servings) for item in feast.items] == [
         ("pan con tomate", 5),
         ("caracoles con vinagre", 5),

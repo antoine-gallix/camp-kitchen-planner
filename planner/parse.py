@@ -177,7 +177,7 @@ def load_project_file(path):
     project = models.Project.create(name=file_.stem, servings=project_data["servings"])
     for recipe_name in project_data["recipes"]:
         recipe = models.Recipe.get(name=recipe_name)
-        models.ProjectItem.create(project=project, recipe=recipe)
+        models.ProjectRecipe.create(project=project, recipe=recipe)
     return project
 
 
