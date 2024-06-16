@@ -12,6 +12,7 @@ from rich.text import Text
 from planner import logger
 from planner.database import DB
 from planner.errors import QueryError
+from planner.logging import add_file_sink
 from planner.parse import Unit, normalize_string, parse_recipe_file
 
 
@@ -82,11 +83,11 @@ class Ingredient(BaseModel):
         )
 
     def dump(self) -> dict:
-        dump_ = dict(name=self.name, unit=str(self.unit))
+        dump_ = dict(
+            name=self.name, unit=str(self.unit), tags=[str(tag) for tag in self.tags]
+        )
         if self.price is not None:
             dump_["price"] = self.price
-        if self.tags:
-            dump_["tags"] = [str(tag) for tag in self.tags]
         return dump_
 
 
@@ -220,13 +221,22 @@ class Project(BaseModel):
 
     def shopping_list(self):
         shopping_list = defaultdict(float)
+        items_before_aggregation = 0
         for project_recipe in self.items:
+            scaling_factor = project_recipe.servings / project_recipe.recipe.serves
+            logger.debug(
+                f"========  {project_recipe.recipe} scaled from {project_recipe.recipe.serves} to {project_recipe.servings} (x{scaling_factor:.2f}). {len(project_recipe.recipe.items)} items"
+            )
             for ingredient_quantity in project_recipe.recipe.items:
-                shopping_list[ingredient_quantity.ingredient] += (
-                    ingredient_quantity.quantity
-                    * project_recipe.servings
-                    / project_recipe.recipe.serves
+                items_before_aggregation += 1
+                scaled_quantity = ingredient_quantity.quantity * scaling_factor
+                logger.debug(
+                    f"{ingredient_quantity.ingredient.name}: {scaled_quantity:.2f} {ingredient_quantity.ingredient.unit}"
                 )
+                shopping_list[ingredient_quantity.ingredient] += scaled_quantity
+        logger.info(
+            f"aggregation reduced item list from {items_before_aggregation} to {len(shopping_list)}"
+        )
         return funcy.lmap(tuple, shopping_list.items())
 
     def priced_shopping_list(self):
@@ -282,19 +292,17 @@ class Project(BaseModel):
         return table
 
     def print_csv_shopping_list(self):
+        add_file_sink()
         t = PrettyTable()
 
         t.field_names = [
             "ingredient",
-            "unit",
             "quantity",
-            "price",
+            "unit",
         ]
 
-        for ingredient, quantity, price in self.priced_shopping_list():
-            t.add_row(
-                (str(ingredient.name), str(ingredient.unit), quantity, ingredient.price)
-            )
+        for ingredient, quantity in self.shopping_list():
+            t.add_row((ingredient.name, f"{quantity:.1f}", str(ingredient.unit)))
         print(t.get_csv_string())
 
     def print_scaled(self):
