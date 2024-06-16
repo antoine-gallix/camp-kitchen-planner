@@ -7,8 +7,8 @@ from typing import Any, Self
 import funcy
 import yaml
 
-from planner import logger, models
 from planner.errors import ParsingError
+from planner.logging import logger
 
 
 def normalize_string(string):
@@ -166,19 +166,6 @@ def parse_recipe_file(
 
     items = funcy.lmap(_parse_item_line, item_lines)
     return name, header, items, instructions
-
-
-# ------------------------- project -------------------------
-
-
-def load_project_file(path):
-    file_ = Path(path)
-    project_data = yaml.load(file_.read_text(), yaml.Loader)
-    project = models.Project.create(name=file_.stem, servings=project_data["servings"])
-    for recipe_name in project_data["recipes"]:
-        recipe = models.Recipe.get(name=recipe_name)
-        models.ProjectRecipe.create(project=project, recipe=recipe)
-    return project
 
 
 # ------------------------- IO -------------------------
