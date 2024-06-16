@@ -32,7 +32,7 @@ def config_() -> None:
 
 @main.command("status")
 def db_summary() -> None:
-    for model in [models.Project, models.Recipe, models.Ingredient]:
+    for model in [models.Project, models.Recipe, models.Ingredient, models.Tag]:
         print(f"{model.__name__} : {explore.count_instances(model)}")
 
 
@@ -69,6 +69,14 @@ def list_tags() -> None:
 def create_tag(name) -> None:
     tag = models.Tag.create(name=name)
     print_success(f"tag created: {tag!r}")
+
+
+@tags.command("delete")
+@click.argument("id", type=click.INT)
+def delete_tag(id) -> None:
+    tag = models.Tag.get_by_id(id)
+    tag.delete_instance()
+    print_success(f"tag removed: {tag!r}")
 
 
 # ------------------------- ingredient -------------------------
