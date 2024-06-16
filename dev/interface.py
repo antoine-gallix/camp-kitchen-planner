@@ -82,7 +82,7 @@ def create_recipe():
             print("choose an ingredient")
             ingredient = choose_or_create_ingredient()
             quantity = input("which quantity?: ")
-            models.IngredientQuantity.create(
+            models.RecipeItem.create(
                 recipe=recipe, ingredient=ingredient, quantity=quantity
             )
         except EOFError:

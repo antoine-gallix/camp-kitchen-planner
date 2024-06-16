@@ -3,7 +3,7 @@ import pytest
 from pytest import fixture, raises
 
 from planner import models
-from planner.parse import Unit
+from planner.parse import Quantity, Unit
 
 
 @fixture(autouse=True)
@@ -52,16 +52,16 @@ def vinagre():
 @fixture
 def pan_con_tomate(pan, tomate):
     recipe = models.Recipe.create(name="pan con tomate", serves=1)
-    models.IngredientQuantity.create(recipe=recipe, ingredient=tomate, quantity=0.1)
-    models.IngredientQuantity.create(recipe=recipe, ingredient=pan, quantity=1)
+    models.RecipeItem.create(recipe=recipe, ingredient=tomate, quantity=0.1)
+    models.RecipeItem.create(recipe=recipe, ingredient=pan, quantity=1)
     return recipe
 
 
 @fixture
 def caracoles_con_vinagre(caracoles, vinagre):
     recipe = models.Recipe.create(name="caracoles con vinagre", serves=1)
-    models.IngredientQuantity.create(recipe=recipe, ingredient=caracoles, quantity=50)
-    models.IngredientQuantity.create(recipe=recipe, ingredient=vinagre, quantity=0.25)
+    models.RecipeItem.create(recipe=recipe, ingredient=caracoles, quantity=50)
+    models.RecipeItem.create(recipe=recipe, ingredient=vinagre, quantity=0.25)
     return recipe
 
 
@@ -204,9 +204,9 @@ def test__Tag__to_multiple_ingredients(tomate, caracoles, fresh):
 # ------------------------- Recipe -------------------------
 
 
+# --- creation
 def test__Recipe__create():
-    pct = models.Recipe(name="pan con tomate", serves=1)
-    pct.save()
+    pct = models.Recipe.create(name="pan con tomate", serves=1)
 
 
 def test__Recipe__all_required():
@@ -244,8 +244,24 @@ def test__Recipe__str():
     assert str(pan_con_tomate) == "pan con tomate (1 persons)"
 
 
+# --- build
+
+
+def test__Recipe__build():
+    recipe = models.Recipe.create(name="pan con tomate", serves=1)
+    recipe.add_item(Quantity.from_tuple(100, "g"), "tomate")
+    recipe.add_item(Quantity.from_tuple(1, "unit"), "pan")
+    assert [
+        (item.quantity, str(item.ingredient.unit), item.ingredient.name)
+        for item in recipe.items
+    ] == [(0.1, "kilogram", "tomate"), (1.0, "unit", "pan")]
+
+
+# --- creation
+
+
 def test__Recipe__full__no_instructions(pan_con_tomate):
-    assert pan_con_tomate.full().split("\n") == [
+    assert pan_con_tomate.as_text().split("\n") == [
         "serves: 1",
         "---",
         "- 0.1 kilogram tomate",
@@ -255,7 +271,7 @@ def test__Recipe__full__no_instructions(pan_con_tomate):
 
 def test__Recipe__full__with_instructions(pan_con_tomate):
     pan_con_tomate.instructions = "grate the tomate\nput on top of the bread"
-    assert pan_con_tomate.full().split("\n") == [
+    assert pan_con_tomate.as_text().split("\n") == [
         "serves: 1",
         "---",
         "- 0.1 kilogram tomate",
@@ -263,16 +279,6 @@ def test__Recipe__full__with_instructions(pan_con_tomate):
         "---",
         "grate the tomate",
         "put on top of the bread",
-    ]
-
-
-def test__Recipe__full__rescale(pan_con_tomate):
-    rescaled = pan_con_tomate.rescale(5)
-    assert rescaled.name == "pan con tomate rescaled for 5"
-    assert rescaled.serves == 5
-    assert [str(item) for item in rescaled.items] == [
-        "0.5 kilogram tomate",
-        "5.0 unit pan",
     ]
 
 

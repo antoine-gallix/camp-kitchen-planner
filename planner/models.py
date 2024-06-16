@@ -126,6 +126,20 @@ class Recipe(BaseModel):
             )
         return "\n".join(description_)
 
+    def add_item(self, quantity, name) -> Self:
+        ingredient, created = Ingredient.get_or_create(
+            name=name, unit=str(quantity.unit)
+        )
+        if created:
+            logger.debug(f"new ingredient created: {ingredient}")
+        else:
+            logger.debug("ingredient found in database")
+        item = RecipeItem.create(
+            ingredient=ingredient, quantity=quantity.number, recipe=self
+        )
+        logger.debug(f"recipe item created: {item}")
+        return item
+
     @classmethod
     def create_from_file(cls, path):
         logger.debug(f"loading file: {str(path)!r}")
@@ -138,18 +152,15 @@ class Recipe(BaseModel):
                 name=name, serves=header["serves"], instructions=instructions
             )
             for quantity, name in items:
-                IngredientQuantity.create_from_tuple(recipe, quantity, name)
+                recipe.add_item(quantity, name)
         logger.info(f"recipe created: {recipe.name}")
         return recipe
-
-    def add_item(self, item):
-        item.recipe = self
 
     @classmethod
     def exists(cls, name) -> bool:
         return cls.get_or_none(cls.name == name) is not None
 
-    def full(self):
+    def as_text(self):
         lines = []
         lines.append(f"serves: {self.serves}")
         lines.append("---")
@@ -161,45 +172,21 @@ class Recipe(BaseModel):
 
         return "\n".join(lines)
 
-    def rescale(self, servings):
-        rescaled = Recipe.create(
-            name=f"{self.name} rescaled for {servings}",
-            serves=servings,
-            instructions=self.instructions,
-        )
-        for item in self.items:
-            IngredientQuantity.create(
-                recipe=rescaled,
-                ingredient=item.ingredient,
-                quantity=item.quantity * servings / self.serves,
-            )
-        return rescaled
-
 
 class IngredientQuantity(BaseModel):
     """An item of a recipe. Ingredient and Quantity"""
 
-    recipe = peewee.ForeignKeyField(Recipe, backref="items")
     ingredient = peewee.ForeignKeyField(Ingredient)
     quantity = peewee.FloatField()
 
     def __str__(self) -> str:
         return f"{self.quantity} {self.ingredient.unit} {self.ingredient.name}"
 
-    @classmethod
-    def create_from_tuple(cls, recipe, quantity, name) -> Self:
-        ingredient, created = Ingredient.get_or_create(
-            name=name, unit=str(quantity.unit)
-        )
-        if created:
-            logger.debug(f"new ingredient created: {ingredient}")
-        else:
-            logger.debug("ingredient found in database")
-        item = IngredientQuantity.create(
-            ingredient=ingredient, quantity=quantity.number, recipe=recipe
-        )
-        logger.debug(f"recipe item created: {item}")
-        return item
+
+class RecipeItem(IngredientQuantity):
+    """An item of a recipe. Ingredient and Quantity"""
+
+    recipe = peewee.ForeignKeyField(Recipe, backref="items")
 
 
 class Project(BaseModel):
@@ -331,13 +318,19 @@ class ProjectRecipe(BaseModel):
         return f"<ProjectItem(project={self.project!r},recipe={self.recipe!r},servings={self.servings})>"
 
 
+class ShoppingList(BaseModel):
+    """List of ingredients and quantities."""
+
+    name = peewee.CharField(unique=True)
+
+
 # All model classes
 all_models = [
     Tag,
     Ingredient,
     IngredientTag,
     Recipe,
-    IngredientQuantity,
+    RecipeItem,
     Project,
     ProjectRecipe,
 ]
