@@ -1,0 +1,787 @@
+name: tablespoon oil
+tags: []
+unit: unit
+---
+name: teaspoon coriander seeds
+tags: [spice]
+unit: unit
+---
+name: teaspoon cumin seeds
+tags: [spice]
+unit: unit
+---
+name: dry curry leaves
+tags: [spice,uncommon]
+unit: unit
+---
+name: white onion
+tags: [fresh]
+unit: unit
+---
+name: clove garlic
+tags: [spice]
+unit: unit
+---
+name: fresh ginger
+tags: [spice]
+unit: kilogram
+---
+name: hot green pepper
+tags: [fresh]
+unit: unit
+---
+name: tablespoon tomato paste
+tags: []
+unit: unit
+---
+name: tomato
+tags: [fresh]
+unit: kilogram
+---
+name: teaspoon salt
+tags: [spice]
+unit: unit
+---
+name: fat coconut milk
+tags: [uncommon]
+unit: liter
+---
+name: water
+tags: []
+unit: liter
+---
+name: canned chickpeas
+tags: []
+unit: kilogram
+---
+name: tablespoon tahina
+tags: [uncommon]
+unit: unit
+---
+name: teaspoon sugar
+tags: []
+unit: unit
+---
+name: chard
+tags: [fresh]
+unit: kilogram
+---
+name: teaspoons garam masala
+tags: [spice,uncommon]
+unit: unit
+---
+name: tablespoon lemon juice
+tags: []
+unit: unit
+---
+name: fresh mint
+tags: [fresh]
+unit: kilogram
+---
+name: fresh cilantro
+tags: [fresh]
+unit: kilogram
+---
+name: teaspoons curry powder
+tags: [spice]
+unit: unit
+---
+name: teaspoon ground cinnamon
+tags: [spice]
+unit: unit
+---
+name: teaspoon grated nutmeg
+tags: [spice]
+unit: unit
+---
+name: teaspoon ground turmeric
+tags: [spice]
+unit: unit
+---
+name: teaspoon pepper
+tags: [spice]
+unit: unit
+---
+name: rice
+tags: []
+unit: kilogram
+---
+name: cucumber
+tags: [fresh]
+unit: kilogram
+---
+name: lemons
+tags: [fresh]
+unit: kilogram
+---
+name: liter olive oil
+tags: []
+unit: unit
+---
+name: mint
+tags: [fresh]
+unit: kilogram
+---
+name: white cabbage
+tags: [fresh]
+unit: unit
+---
+name: red cabbage
+tags: [fresh]
+unit: unit
+---
+name: carrot
+tags: [fresh]
+unit: unit
+---
+name: red pepper
+tags: [fresh]
+unit: unit
+---
+name: green onion
+tags: [fresh]
+unit: kilogram
+---
+name: cilantro
+tags: [fresh]
+unit: kilogram
+---
+name: peanut butter
+tags: []
+unit: kilogram
+---
+name: lemon
+tags: [fresh]
+unit: unit
+---
+name: rice vinegar
+tags: [condiment]
+unit: tablespoon
+---
+name: gluten free soy sauce
+tags: [uncommon]
+unit: tablespoon
+---
+name: date honey
+tags: [uncommon]
+unit: tablespoon
+---
+name: brown sugar
+tags: []
+unit: tablespoon
+---
+name: sesame oil
+tags: [uncommon]
+unit: tablespoon
+---
+name: sriracha sauce
+tags: [uncommon]
+unit: teaspoon
+---
+name: ginger
+tags: [spice]
+unit: teaspoon
+---
+name: garlic clove
+tags: [spice]
+unit: unit
+---
+name: tofu
+tags: [uncommon]
+unit: kilogram
+---
+name: cauliflower
+tags: [fresh]
+unit: kilogram
+---
+name: gluten free soba noodles
+tags: [uncommon]
+unit: kilogram
+---
+name: gluten free soy sauce
+tags: [uncommon]
+unit: kilogram
+---
+name: black pepper
+tags: [spice]
+unit: teaspoon
+---
+name: sugar
+tags: []
+unit: tablespoon
+---
+name: canola oil
+tags: []
+unit: tablespoon
+---
+name: sesame seeds
+tags: [uncommon]
+unit: tablespoon
+---
+name: olive oil
+tags: []
+unit: liter
+---
+name: red onion
+tags: [fresh]
+unit: unit
+---
+name: celery stalks
+tags: [fresh]
+unit: unit
+---
+name: salt
+tags: [spice]
+unit: tablespoon
+---
+name: garlic header
+tags: [spice]
+unit: unit
+---
+name: chili powder
+tags: [spice]
+unit: tablespoon
+---
+name: ground cumin
+tags: [spice]
+unit: tablespoon
+---
+name: smoked paprika
+tags: [spice]
+unit: tablespoon
+---
+name: dried oregano
+tags: [spice]
+unit: tablespoon
+---
+name: diced tomatoes
+tags: []
+unit: kilogram
+---
+name: tomato
+tags: [fresh]
+unit: unit
+---
+name: black beans
+tags: []
+unit: kilogram
+---
+name: pinto beans
+tags: []
+unit: kilogram
+---
+name: vegetable broth
+tags: [spice]
+unit: liter
+---
+name: bay leafs
+tags: [spice]
+unit: unit
+---
+name: lime
+tags: [fresh]
+unit: unit
+---
+name: wheat tortilla wrap
+tags: [uncommon]
+unit: unit
+---
+name: corn tortilla wrap
+tags: [uncommon]
+unit: unit
+---
+name: bell pepper
+tags: [fresh]
+unit: unit
+---
+name: zucchini
+tags: [fresh]
+unit: unit
+---
+name: teaspoon herb mix
+tags: [spice]
+unit: unit
+---
+name: avocado
+tags: [fresh]
+unit: unit
+---
+name: bunch cilantro
+tags: [fresh]
+unit: unit
+---
+name: olive oil
+tags: [condiment]
+unit: tablespoon
+---
+name: sweet potato
+tags: [fresh]
+unit: unit
+---
+name: broccoli
+tags: [fresh]
+unit: unit
+---
+name: gluten free quinoa
+tags: [uncommon]
+unit: kilogram
+---
+name: cucumber
+tags: [fresh]
+unit: unit
+---
+name: cabbage
+tags: [fresh]
+unit: unit
+---
+name: green onion
+tags: [fresh]
+unit: unit
+---
+name: ruccula
+tags: [fresh]
+unit: kilogram
+---
+name: cumin
+tags: [spice]
+unit: teaspoon
+---
+name: chili powder
+tags: [spice]
+unit: teaspoon
+---
+name: garlic powder
+tags: [spice]
+unit: teaspoon
+---
+name: salt
+tags: [spice]
+unit: teaspoon
+---
+name: ginger
+tags: [spice]
+unit: tablespoon
+---
+name: maple syrup
+tags: [uncommon]
+unit: tablespoon
+---
+name: cayenne pepper
+tags: [spice]
+unit: teaspoon
+---
+name: tahini
+tags: [uncommon]
+unit: kilogram
+---
+name: hot water
+tags: []
+unit: tablespoon
+---
+name: gluten free glass noodles
+tags: [uncommon]
+unit: kilogram
+---
+name: coriander
+tags: [fresh]
+unit: kilogram
+---
+name: roasted peanuts
+tags: []
+unit: kilogram
+---
+name: lemons
+tags: [fresh]
+unit: unit
+---
+name: sesame oil
+tags: [uncommon]
+unit: teaspoon
+---
+name: sweet chili sauce
+tags: [uncommon]
+unit: tablespoon
+---
+name: gochujang
+tags: [uncommon]
+unit: teaspoon
+---
+name: gochugaru
+tags: [uncommon]
+unit: teaspoon
+---
+name: sugar
+tags: []
+unit: teaspoon
+---
+name: fusilli pasta
+tags: []
+unit: kilogram
+---
+name: pickles
+tags: [condiment]
+unit: kilogram
+---
+name: white onions
+tags: [fresh]
+unit: kilogram
+---
+name: sweet peppers
+tags: [fresh]
+unit: kilogram
+---
+name: tomatoes
+tags: [fresh]
+unit: kilogram
+---
+name: litre olive oil
+tags: [condiment]
+unit: unit
+---
+name: vinegar
+tags: [condiment]
+unit: liter
+---
+name: mustard salt
+tags: [spice]
+unit: kilogram
+---
+name: dry lentils
+tags: []
+unit: kilogram
+---
+name: mustard
+tags: [spice]
+unit: kilogram
+---
+name: leaves laurel
+tags: [spice]
+unit: unit
+---
+name: teaspoon thyme
+tags: [spice]
+unit: unit
+---
+name: tomato juice
+tags: [drink]
+unit: liter
+---
+name: lemon juice
+tags: [drink]
+unit: liter
+---
+name: lime juice
+tags: [drink]
+unit: liter
+---
+name: prepared horseradish
+tags: [uncommon]
+unit: liter
+---
+name: worcestershire sauce
+tags: [spice]
+unit: liter
+---
+name: pickle juice
+tags: []
+unit: liter
+---
+name: teaspoon garlic powder
+tags: [spice]
+unit: unit
+---
+name: tabasco sauce
+tags: [spice]
+unit: liter
+---
+name: teaspoon celery salt
+tags: []
+unit: unit
+---
+name: teaspoon coarse black pepper
+tags: [spice]
+unit: unit
+---
+name: vodka
+tags: [drink]
+unit: liter
+---
+name: raddler six-pack
+tags: [drink]
+unit: unit
+---
+name: wine bottle
+tags: [drink]
+unit: unit
+---
+name: gluten-free beer six-pack
+tags: [drink]
+unit: unit
+---
+name: alcohol-free beer six-pack
+tags: [drink]
+unit: unit
+---
+name: tonic bottle
+tags: [drink]
+unit: unit
+---
+name: loaf bread <weight>
+tags: [fresh]
+unit: unit
+---
+name: loaf baguette <weight>
+tags: [fresh]
+unit: unit
+---
+name: loaf gluten free bread <weight>
+tags: [uncommon]
+unit: unit
+---
+name: pasta
+tags: []
+unit: kilogram
+---
+name: gluten-free pasta
+tags: [uncommon]
+unit: kilogram
+---
+name: flour
+tags: []
+unit: kilogram
+---
+name: gluten free flour
+tags: [uncommon]
+unit: kilogram
+---
+name: pack brioche <weight>
+tags: []
+unit: unit
+---
+name: granola
+tags: []
+unit: kilogram
+---
+name: oatmeal
+tags: []
+unit: kilogram
+---
+name: mixed nuts
+tags: []
+unit: kilogram
+---
+name: wraps
+tags: [uncommon]
+unit: unit
+---
+name: pack rice cakes
+tags: []
+unit: unit
+---
+name: canned fruits
+tags: []
+unit: kilogram
+---
+name: avocadoes
+tags: [fresh]
+unit: unit
+---
+name: peach
+tags: [fresh]
+unit: kilogram
+---
+name: bananas
+tags: [fresh]
+unit: kilogram
+---
+name: melon
+tags: [fresh]
+unit: unit
+---
+name: watermelon
+tags: [fresh]
+unit: unit
+---
+name: nectarines
+tags: [fresh]
+unit: kilogram
+---
+name: fresh peppers
+tags: [fresh]
+unit: unit
+---
+name: red onion
+tags: [fresh]
+unit: kilogram
+---
+name: bundle spring onions
+tags: [fresh]
+unit: unit
+---
+name: garlic
+tags: [spice]
+unit: kilogram
+---
+name: kaki
+tags: [fresh]
+unit: kilogram
+---
+name: zucchini
+tags: [fresh]
+unit: kilogram
+---
+name: potato
+tags: []
+unit: kilogram
+---
+name: carrot
+tags: [fresh]
+unit: kilogram
+---
+name: lettuce
+tags: [fresh]
+unit: unit
+---
+name: oranges
+tags: [fresh]
+unit: kilogram
+---
+name: yoghurt
+tags: [dairy]
+unit: liter
+---
+name: soy yoghurt
+tags: []
+unit: liter
+---
+name: milk
+tags: []
+unit: liter
+---
+name: soy milk
+tags: []
+unit: liter
+---
+name: eggs
+tags: []
+unit: unit
+---
+name: hummus
+tags: []
+unit: kilogram
+---
+name: cheese
+tags: []
+unit: kilogram
+---
+name: packs bacon
+tags: []
+unit: unit
+---
+name: canned lentils
+tags: []
+unit: kilogram
+---
+name: coffee
+tags: []
+unit: kilogram
+---
+name: black tea bags
+tags: []
+unit: unit
+---
+name: green tea bags
+tags: []
+unit: unit
+---
+name: peppermint tea bags
+tags: []
+unit: unit
+---
+name: herbal tea bags
+tags: []
+unit: unit
+---
+name: liter sparkling water
+tags: [drink]
+unit: unit
+---
+name: liter orange juice
+tags: [drink]
+unit: unit
+---
+name: liter peach juice
+tags: [drink]
+unit: unit
+---
+name: liter aquarius limon
+tags: [drink]
+unit: unit
+---
+name: jar pesto
+tags: [condiment]
+unit: unit
+---
+name: vegan butter
+tags: []
+unit: kilogram
+---
+name: jar nutella
+tags: []
+unit: unit
+---
+name: jam
+tags: []
+unit: kilogram
+---
+name: jar vegan nutella
+tags: [uncommon]
+unit: unit
+---
+name: sriracha mayo
+tags: [uncommon]
+unit: unit
+---
+name: chilli oil
+tags: [uncommon]
+unit: unit
+---
+name: bottle lemon juice
+tags: [drink]
+unit: unit
+---
+name: bottle lime juice
+tags: [drink]
+unit: unit
+---
+name: fried onion box
+tags: []
+unit: unit
+---
+name: can coconut milk
+tags: [uncommon]
+unit: unit
+---
+name: liter pasta sauce
+tags: []
+unit: unit
+---
+name: olives
+tags: []
+unit: kilogram
+---
+name: cinnamon
+tags: [spice]
+unit: kilogram
+---
+name: sugar
+tags: []
+unit: kilogram
+---
+name: bag potato chips
+tags: []
+unit: unit
+---
+name: bag bhuja mix
+tags: []
+unit: unit
