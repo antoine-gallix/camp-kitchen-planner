@@ -1,4 +1,5 @@
 import peewee
+import pytest
 from pytest import fixture, raises
 
 from planner import models
@@ -69,9 +70,9 @@ def caracoles_con_vinagre(caracoles, vinagre):
 
 @fixture
 def feast(pan_con_tomate, caracoles_con_vinagre):
-    feast = models.Project.create(name="feast", servings=5)
-    models.ProjectItem.create(recipe=pan_con_tomate, project=feast)
-    models.ProjectItem.create(recipe=caracoles_con_vinagre, project=feast)
+    feast = models.Project.create(name="feast")
+    models.ProjectItem.create(recipe=pan_con_tomate, project=feast, servings=5)
+    models.ProjectItem.create(recipe=caracoles_con_vinagre, project=feast, servings=5)
     return feast
 
 
@@ -291,21 +292,25 @@ def test__Recipe__from_file():
 
 
 def test__Project__create_empty():
-    models.Project.create(name="feast", servings=5)
+    models.Project.create(name="feast")
 
 
 def test__Project__repr(feast):
-    assert repr(feast) == "Project(name=feast,servings=5)"
+    assert repr(feast) == "Project(name=feast)"
 
 
 def test__Project__str(feast):
-    assert str(feast) == "feast: 2 recipes for 5 servings"
+    assert str(feast) == "feast: 2 recipes"
 
 
 def test__Project__create_filled(pan_con_tomate, caracoles_con_vinagre):
-    feast = models.Project.create(name="feast", servings=5)
-    models.ProjectItem.create(recipe=pan_con_tomate, project=feast)
-    models.ProjectItem.create(recipe=caracoles_con_vinagre, project=feast)
+    feast = models.Project.create(name="feast")
+    models.ProjectItem.create(recipe=pan_con_tomate, project=feast, servings=5)
+    models.ProjectItem.create(recipe=caracoles_con_vinagre, project=feast, servings=5)
+    assert [(item.recipe.name, item.servings) for item in feast.items] == [
+        ("pan con tomate", 5),
+        ("caracoles con vinagre", 5),
+    ]
 
 
 def test__Project__shopping_list(feast, pan, tomate, caracoles, vinagre):
@@ -326,31 +331,3 @@ def test__Project__priced_shopping_list(feast, pan, tomate, caracoles, vinagre):
         (caracoles, 250, 3000),
         (vinagre, 1.25, 3.125),
     ]
-
-
-# ------------------------- recipe -------------------------
-
-
-# def test__Item__create_from_line():
-#     recipe = models.Recipe.create(name="compote de pommes", serves=1)
-#     parse.create_item_from_line("2kg pommes", recipe)
-#     assert len(recipe.items) == 1
-#     item = recipe.items[0]
-#     assert item.quantity == 2
-#     assert item.ingredient.name == "pommes"
-#     assert item.ingredient.unit == "kg"
-
-
-# def test__Item__create_from_line__conversion():
-#     recipe = models.Recipe.create(name="compote de pommes", serves=1)
-#     pommes_item = parse.create_item_from_line("200g pommes", recipe)
-#     assert str(pommes_item) == "0.2kg pommes"
-#     wine_item = parse.create_item_from_line("200ml wine", recipe)
-#     assert str(wine_item) == "0.2l wine"
-
-
-# ------------------------- ingredients -------------------------
-
-# load_ingredients_from_file
-# make a ingredient yaml file, and load it
-# test atomicity

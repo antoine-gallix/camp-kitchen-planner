@@ -1,4 +1,3 @@
-import re
 from collections import defaultdict
 from typing import Self
 
@@ -204,17 +203,12 @@ class Project(BaseModel):
     """Multiple dishes for a certain number of servings"""
 
     name = peewee.CharField(unique=True)
-    servings = peewee.IntegerField()
 
     def __str__(self) -> str:
-        return f"{self.name}: {funcy.ilen(self.recipes)} recipes for {self.servings} servings"
+        return f"{self.name}: {funcy.ilen(self.items)} recipes"
 
     def __repr__(self) -> str:
-        return f"Project(name={self.name},servings={self.servings})"
-
-    @property
-    def recipes(self):
-        return (dish.recipe for dish in self.dishes)
+        return f"Project(name={self.name})"
 
     @classmethod
     def get_default(cls):
@@ -229,12 +223,16 @@ class Project(BaseModel):
                     f"{len(projects)} project in the database. could not determine default"
                 )
 
+    # --- compute shopping list
+
     def shopping_list(self):
         shopping_list = defaultdict(float)
-        for recipe in self.recipes:
-            for item in recipe.items:
-                shopping_list[item.ingredient] += (
-                    item.quantity * self.servings / recipe.serves
+        for project_recipe in self.items:
+            for ingredient_quantity in project_recipe.recipe.items:
+                shopping_list[ingredient_quantity.ingredient] += (
+                    ingredient_quantity.quantity
+                    * project_recipe.servings
+                    / project_recipe.recipe.serves
                 )
         return funcy.lmap(tuple, shopping_list.items())
 
@@ -250,10 +248,12 @@ class Project(BaseModel):
         ]
         return priced_shopping_list
 
+    # --- prints
+
     def print_summary(self):
         print(self)
-        for recipe in self.recipes:
-            print(f"- {recipe.name}")
+        for item in self.items:
+            print(f"- {item.name} for {item.servings}")
 
     def print_shopping_list(self):
         t = PrettyTable()
@@ -310,11 +310,12 @@ class Project(BaseModel):
 class ProjectItem(BaseModel):
     """A dish of a project"""
 
-    project = peewee.ForeignKeyField(Project, backref="dishes")
+    project = peewee.ForeignKeyField(Project, backref="items")
     recipe = peewee.ForeignKeyField(Recipe)
+    servings = peewee.IntegerField()
 
     def __repr__(self) -> str:
-        return f"<ProjectItem({self.recipe} in {self.project})>"
+        return f"<ProjectItem(project={self.project!r},recipe={self.recipe!r},servings={self.servings})>"
 
 
 # All model classes
