@@ -3,7 +3,7 @@ from pathlib import Path
 import click
 import peewee
 from peewee import DatabaseError
-from rich import print
+from rich import print, rule
 from rich.text import Text
 
 from planner import app, config, explore, models, parse
@@ -143,13 +143,20 @@ def load_recipe_file(file) -> None:
 
 
 @recipe.command("show")
-@click.argument("recipe", type=click.STRING)
+@click.option("--name", type=click.STRING)
+@click.option("--id", type=click.INT)
 @click.option("--rescale", type=click.FLOAT)
-def show_recipe(recipe, rescale: int | None = None) -> None:
+def show_recipe(name, id, rescale: int | None = None) -> None:
     """Prin the recipe, with optional rescaling."""
-    recipe = models.Recipe.get(name=recipe)
+    if id is not None:
+        recipe = models.Recipe.get_by_id(id)
+    elif name is not None:
+        recipe = models.Recipe.get(name=recipe)
+    else:
+        print_error("recipe not found")
     if rescale:
         recipe = recipe.rescale(rescale)
+    print(rule.Rule(recipe.name))
     print(recipe.full())
 
 
