@@ -196,6 +196,17 @@ project = click.Group("project")
 main.add_command(project)
 
 
+def select_project(name):
+    if name is not None:
+        try:
+            return models.Project.get(name=name)
+        except peewee.DoesNotExist:
+            raise ValueError(f"no project named {name}")
+    else:
+        print("using default project")
+        return models.Project.get_default()
+
+
 @project.command("create")
 @click.argument("name", type=click.STRING)
 def create_project(name):
@@ -211,15 +222,7 @@ def list_projects() -> None:
 @project.command("show")
 @click.option("--name", type=click.STRING, default=None)
 def show_project(name) -> None:
-    if name is not None:
-        try:
-            project = models.Project.get(name=name)
-        except peewee.DoesNotExist:
-            print(f"no project named {name}")
-            return
-    else:
-        print("showing default project")
-        project = models.Project.get_default()
+    project = select_project(name)
     print(project.detail_printable())
 
 
@@ -248,10 +251,13 @@ def delete_project(name) -> None:
     "--id",
     type=click.INT,
 )
-@click.argument("servings", type=click.INT)
-def add_recipe(file, name, id, servings):
+@click.option("--servings", type=click.INT)
+@click.option("--project", type=click.STRING)
+def add_recipe(file, name, id, servings, project):
     "Add recipe file to default project"
-    project = models.Project.get_default()
+    # project
+    project = select_project(project)
+    # recipe
     if id is not None:
         recipe = models.Recipe.get_by_id(id)
         print(f"recipe fetched from database: {recipe}")
@@ -263,6 +269,9 @@ def add_recipe(file, name, id, servings):
         print(f"recipe created from file: {recipe}")
     else:
         print_error("could not find recipe")
+    if not servings:
+        print("no rescaling")
+        servings = recipe.serves
     project.add_recipe(recipe=recipe, servings=servings)
     print(f"recipe added to project {project.name!r}: {recipe.name!r} for {servings}")
 

@@ -213,7 +213,7 @@ class Project(BaseModel):
             case 1:
                 return projects[0]
             case _:
-                QueryError(
+                raise QueryError(
                     f"{len(projects)} project in the database. could not determine default"
                 )
 
