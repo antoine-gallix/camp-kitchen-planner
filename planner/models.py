@@ -280,10 +280,18 @@ class Project(BaseModel):
 
     def shopping_list_table(self):
         table = PrettyTable()
-        table.field_names = ["ingredient", "quantity"]
-
-        for ingredient, quantity in self.shopping_list():
-            table.add_row((ingredient.name, f"{quantity:.1f} {ingredient.unit}"))
+        table.field_names = ["ingredient", "quantity", "category"]
+        rows = [
+            (
+                ingredient.name,
+                f"{quantity:.1f} {ingredient.unit}",
+                ingredient.category,
+            )
+            for ingredient, quantity in self.shopping_list()
+        ]
+        rows = sorted(rows, key=lambda r: (r[2], r[0]))
+        for row in rows:
+            table.add_row(row)
         return table
 
     def priced_shopping_list_table(self):
@@ -308,14 +316,19 @@ class Project(BaseModel):
         add_file_sink()
         t = PrettyTable()
 
-        t.field_names = [
-            "ingredient",
-            "quantity",
-            "unit",
+        t.field_names = ["ingredient", "quantity", "unit", "category"]
+        rows = [
+            (
+                ingredient.name,
+                f"{quantity:.1f}",
+                str(ingredient.unit),
+                ingredient.category,
+            )
+            for ingredient, quantity in self.shopping_list()
         ]
-
-        for ingredient, quantity in self.shopping_list():
-            t.add_row((ingredient.name, f"{quantity:.1f}", str(ingredient.unit)))
+        rows = sorted(rows, key=lambda r: (r[3], r[0]))
+        for row in rows:
+            t.add_row(row)
         print(t.get_csv_string())
 
     def print_scaled(self):
