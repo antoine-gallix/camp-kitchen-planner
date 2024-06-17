@@ -3,12 +3,13 @@ from pathlib import Path
 import click
 import funcy
 import peewee
+import yaml
 from peewee import DatabaseError
 from rich import print, rule
 from rich.text import Text
 from yaml import Loader, load_all
 
-from planner import app, config, explore, models, parse
+from planner import app, config, explore, models
 from planner.database import DB
 from planner.errors import ParsingError
 
@@ -82,17 +83,29 @@ def delete_tag(id) -> None:
 
 
 @tags.command("update-from-file")
-@click.option("file", type=click.Path(exists=True, readable=True))
-def update_tags_from_file(file) -> None:
+@click.argument("file", type=click.Path(exists=True, readable=True))
+@click.option("--create-tags", is_flag=True)
+def update_tags_from_file(file, create_tags) -> None:
     ingredient_update = list(load_all(Path(file).open(), Loader=Loader))
     tag_names = set(
         funcy.flatten(ingredient["tags"] for ingredient in ingredient_update)
     )
-    tags = {tag_name: models.Tag.get(name=tag_name) for tag_name in tag_names}
+    if create_tags:
+        tags = {}
+        for tag_name in tag_names:
+            tag, created = models.Tag.get_or_create(name=tag_name)
+            if created:
+                print_success(f"tag created: {tag!r}")
+            tags[tag_name] = tag
+    else:
+        tags = {tag_name: models.Tag.get(name=tag_name) for tag_name in tag_names}
     for update_item in ingredient_update:
-        ingredient = models.Ingredient.get(name=update_item["name"])
-        for tag in (tags[tag_name] for tag_name in update_item["tags"]):
-            ingredient.add_tag(tag)
+        try:
+            ingredient = models.Ingredient.get(name=update_item["name"])
+            for tag in (tags[tag_name] for tag_name in update_item["tags"]):
+                ingredient.add_tag(tag)
+        except peewee.DoesNotExist:
+            print_error(f"could not find ingredient: {update_item["name"]}")
 
 
 # ------------------------- ingredient -------------------------
@@ -116,7 +129,9 @@ def show_ingredient(id) -> None:
 @ingredient.command("export")
 @click.argument("file", type=click.Path(writable=True))
 def dump_ingredients(file) -> None:
-    parse.dump_ingredients(file)
+    print(f"writing ingredients in {file!r}")
+    serialized = [ingredient.dump() for ingredient in models.Ingredient.select()]
+    yaml.dump_all(serialized, Path(file).open("w"))
 
 
 # ------------------------- recipe -------------------------
@@ -150,12 +165,6 @@ def load_recipe_into_database(file):
         print_error(f"error during parsing. operation canceled: {exc}")
     except DatabaseError as exc:
         print_error(f"error from database during loading. operation canceled: {exc}")
-
-
-@main.command()
-@click.argument("file", type=click.Path(exists=True, readable=True))
-def load_recipe_file(file) -> None:
-    parse.load_recipe_file(file)
 
 
 @recipe.command("show")
