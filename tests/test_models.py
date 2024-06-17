@@ -214,7 +214,6 @@ def test__Tag__to_multiple_ingredients(tomate, caracoles, fresh):
 
 
 def test__Ingredient__category_usual(tomate):
-    tomate.add_tag(fresh)
     assert tomate.category == "usual"
 
 

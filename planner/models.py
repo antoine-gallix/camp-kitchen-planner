@@ -85,6 +85,16 @@ class Ingredient(BaseModel):
             .where(Ingredient.id == self.id)
         )
 
+    @property
+    def category(self):
+        tag_names = [tag.name for tag in self.tags]
+        if "uncommon" in tag_names:
+            return "uncommon"
+        elif "fresh" in tag_names:
+            return "fresh"
+        else:
+            return "usual"
+
     def dump(self) -> dict:
         dump_ = dict(
             name=self.name, unit=str(self.unit), tags=[str(tag) for tag in self.tags]
