@@ -193,12 +193,3 @@ def parse_recipe_file(
 
     items = funcy.lmap(_parse_item_line, item_lines)
     return name, header, items, instructions
-
-
-# ------------------------- IO -------------------------
-
-
-def dump_ingredients(file_path) -> None:
-    logger.info(f"writing ingredients in {file_path!r}")
-    serialized = [ingredient.dump() for ingredient in models.Ingredient.select()]
-    yaml.dump_all(serialized, Path(file_path).open("w"))

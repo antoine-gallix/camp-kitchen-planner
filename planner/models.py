@@ -72,7 +72,7 @@ class Ingredient(BaseModel):
 
     def add_tag(self, tag: Tag):
         try:
-            IngredientTag.get_or_create(ingredient=self, tag=tag)
+            IngredientTag.create(ingredient=self, tag=tag)
         except peewee.IntegrityError:
             logger.warning(f"tag already existed on {self.name}: {tag.name}")
 
