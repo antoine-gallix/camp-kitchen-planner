@@ -25,6 +25,11 @@ def delicious():
     return models.Tag.create(name="delicious")
 
 
+@fixture
+def uncommon():
+    return models.Tag.create(name="uncommon")
+
+
 # --- ingredients
 
 
@@ -139,9 +144,14 @@ def test__Ingredient__price():
 
 def test__Ingredient__dump():
     salsifi = models.Ingredient.create(name="salsifi", unit=Unit.KILOGRAM, price=10)
-    assert salsifi.dump() == {"name": "salsifi", "price": 10, "unit": "kilogram"}
+    assert salsifi.dump() == {
+        "name": "salsifi",
+        "price": 10,
+        "unit": "kilogram",
+        "tags": [],
+    }
     salsifi = models.Ingredient.create(name="tomate", unit=Unit.KILOGRAM)
-    assert salsifi.dump() == {"name": "tomate", "unit": "kilogram"}
+    assert salsifi.dump() == {"name": "tomate", "unit": "kilogram", "tags": []}
 
 
 def test__Ingredient__lowercase():
@@ -186,8 +196,8 @@ def test__Ingredient__add_tag(tomate, fresh):
 
 def test__Tag__add_to_tag_only_once(tomate, fresh):
     tomate.add_tag(fresh)
-    with raises(peewee.IntegrityError):
-        tomate.add_tag(fresh)
+    tomate.add_tag(fresh)
+    assert [tag.name for tag in tomate.tags] == ["fresh"]
 
 
 def test__Tag__multiple_tag_to_ingredient(tomate, fresh, delicious):
@@ -201,6 +211,22 @@ def test__Tag__to_multiple_ingredients(tomate, caracoles, fresh):
     caracoles.add_tag(fresh)
     assert list(tomate.tags) == [fresh]
     assert list(caracoles.tags) == [fresh]
+
+
+def test__Ingredient__category_usual(tomate):
+    tomate.add_tag(fresh)
+    assert tomate.category == "usual"
+
+
+def test__Ingredient__category_fresh(tomate, fresh):
+    tomate.add_tag(fresh)
+    assert tomate.category == "fresh"
+
+
+def test__Ingredient__category_uncommon(tomate, fresh, uncommon):
+    tomate.add_tag(fresh)
+    tomate.add_tag(uncommon)
+    assert tomate.category == "uncommon"
 
 
 # ------------------------- Recipe -------------------------
