@@ -41,7 +41,7 @@ class Quantity:
         match unit_string:
             case "g" | "gram" | "grams":
                 return cls(number * 1e-3, Unit.KILOGRAM)
-            case "kg" | "kilo" | "kilos" | "kilograms":
+            case "kg" | "kilo" | "kilos" | "kilogram" | "kilograms":
                 return cls(number, Unit.KILOGRAM)
             case "ml" | "mililiter" | "mililiters":
                 return cls(number * 1e-3, Unit.LITER)
@@ -69,7 +69,34 @@ def _parse_item_line(line):
     line = line.strip()  # remove border spaces
 
     # regexes
-    UNIT_SYMBOLS = ["g", "kg", "L", "l", "ml", "cl", "tsp", "tbsp", "unit"]
+    UNIT_SYMBOLS = [
+        "g",
+        "gram",
+        "grams",
+        "kilo",
+        "kilos",
+        "kilogram",
+        "kilograms",
+        "kg",
+        "kgs",
+        "liter",
+        "L",
+        "l",
+        "ml",
+        "mililiter",
+        "mililiters",
+        "centiliter",
+        "centiliters",
+        "cl",
+        "tsp",
+        "teaspoon",
+        "teaspoons",
+        "tbsp",
+        "tablespoon",
+        "tablespoons",
+        "unit",
+        "units",
+    ]
     UNIT_SYMBOL_REGEX = f"({'|'.join(UNIT_SYMBOLS)})"
     NUMBER_REGEX = r"[\d\.]+"
     QUANTITY_REGEX = NUMBER_REGEX + r"\s?" + f"{UNIT_SYMBOL_REGEX}?" + r"(?=\s)"
