@@ -1,10 +1,12 @@
 from pathlib import Path
 
 import click
+import funcy
 import peewee
 from peewee import DatabaseError
 from rich import print, rule
 from rich.text import Text
+from yaml import Loader, load_all
 
 from planner import app, config, explore, models, parse
 from planner.database import DB
@@ -79,6 +81,20 @@ def delete_tag(id) -> None:
     print_success(f"tag removed: {tag!r}")
 
 
+@tags.command("update-from-file")
+@click.option("file", type=click.Path(exists=True, readable=True))
+def update_tags_from_file(file) -> None:
+    ingredient_update = list(load_all(Path(file).open(), Loader=Loader))
+    tag_names = set(
+        funcy.flatten(ingredient["tags"] for ingredient in ingredient_update)
+    )
+    tags = {tag_name: models.Tag.get(name=tag_name) for tag_name in tag_names}
+    for update_item in ingredient_update:
+        ingredient = models.Ingredient.get(name=update_item["name"])
+        for tag in (tags[tag_name] for tag_name in update_item["tags"]):
+            ingredient.add_tag(tag)
+
+
 # ------------------------- ingredient -------------------------
 
 ingredient = click.Group("ingredient")
@@ -98,7 +114,7 @@ def show_ingredient(id) -> None:
 
 
 @ingredient.command("export")
-@click.option("--file", type=click.Path(writable=True), default="ingredients.yaml")
+@click.argument("file", type=click.Path(writable=True))
 def dump_ingredients(file) -> None:
     parse.dump_ingredients(file)
 
