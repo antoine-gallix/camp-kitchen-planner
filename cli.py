@@ -278,8 +278,9 @@ def add_recipe(file, name, id, servings, project):
 
 @project.command()
 @click.option("--csv", is_flag=True)
-def shopping_list(csv) -> None:
-    project = models.Project.get_default()
+@click.option("--name", type=click.STRING)
+def shopping_list(csv, name) -> None:
+    project = select_project(name)
     if csv is True:
         project.print_csv_shopping_list()
     else:
