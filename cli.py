@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 
 import click
@@ -6,6 +7,7 @@ import peewee
 import yaml
 from peewee import DatabaseError
 from rich import print, rule
+from rich.console import Console
 from rich.text import Text
 from yaml import Loader, load_all
 
@@ -282,10 +284,44 @@ def add_recipe(file, name, id, servings, project):
 def shopping_list(csv, name) -> None:
     project = select_project(name)
     if csv is True:
-        project.print_csv_shopping_list()
+        print(project.csv_shopping_list())
     else:
         print(project.detail_printable())
         print(project.shopping_list_table())
+
+
+@project.command()
+@click.argument("id", type=click.INT)
+def export(id) -> None:
+    # get project
+    project = models.Project.get_by_id(id)
+    # ensure empty dir
+    target_dir = Path("projects") / project.name
+    if target_dir.exists():
+        print(f"deleting directory: {target_dir}")
+        shutil.rmtree(target_dir)
+    print(f"creating directory: {target_dir}")
+    target_dir.mkdir()
+    # make summary file
+    summary_file = target_dir / "summary.txt"
+    with summary_file.open("w") as file:
+        console = Console(file=file)
+        print(f"writing summary : {summary_file}")
+        console.print(project.detail_printable())
+    # print csv shopping list in a file
+    shopping_list_file = target_dir / "shopping_list.csv"
+    print(f"writing shopping list : {shopping_list_file}")
+    shopping_list_file.write_text(project.csv_shopping_list())
+    # for each item, print scaled recipe in a file
+    for item in project.items:
+        recipe_file = (target_dir / item.recipe.name).with_suffix(".txt")
+        print(f"writing recipe file: {recipe_file}")
+        recipe_file.write_text(item.recipe.as_text(servings=item.servings))
+    # copy logs
+    source_log_file = Path("logs.txt")
+    log_file = target_dir / "logs.txt"
+    print(f"copying logs: {log_file}")
+    shutil.copy(source_log_file, log_file)
 
 
 if __name__ == "__main__":

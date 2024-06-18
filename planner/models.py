@@ -183,7 +183,7 @@ class Recipe(BaseModel):
         yield f"serves: {self.serves * scaling_factor}"
         yield "---"
         for item in self.items:
-            yield f"- {item.quantity * scaling_factor} {item.ingredient.unit} {item.ingredient}"
+            yield f"- {item.quantity * scaling_factor:.2f} {item.ingredient.unit} {item.ingredient}"
         if self.instructions is not None:
             yield "---"
             yield self.instructions
@@ -316,8 +316,8 @@ class Project(BaseModel):
             )
         return table
 
-    def print_csv_shopping_list(self):
-        add_file_sink()
+    def csv_shopping_list(self):
+        file_sink = add_file_sink()
         t = PrettyTable()
 
         t.field_names = ["ingredient", "quantity", "unit", "category"]
@@ -333,7 +333,8 @@ class Project(BaseModel):
         rows = sorted(rows, key=lambda r: (r[3], r[0]))
         for row in rows:
             t.add_row(row)
-        print(t.get_csv_string())
+        logger.remove(file_sink)
+        return t.get_csv_string()
 
     def compute(self): ...
 
