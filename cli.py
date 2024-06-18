@@ -240,7 +240,7 @@ def delete_project(name) -> None:
     print_success(f"project deleted: {project.name}")
 
 
-@project.command("add")
+@project.command("add-recipe")
 @click.option(
     "--file",
     type=click.Path(exists=True, dir_okay=False, readable=True, resolve_path=True),
@@ -255,7 +255,7 @@ def delete_project(name) -> None:
 )
 @click.option("--servings", type=click.INT)
 @click.option("--project", type=click.STRING)
-def add_recipe(file, name, id, servings, project):
+def add_recipe_to_project(file, name, id, servings, project):
     "Add recipe file to default project"
     # project
     project = select_project(project)
