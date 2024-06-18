@@ -180,7 +180,7 @@ class Recipe(BaseModel):
             scaling_factor = servings / self.serves
         else:
             scaling_factor = 1
-        yield f"serves: {self.serves}"
+        yield f"serves: {self.serves * scaling_factor}"
         yield "---"
         for item in self.items:
             yield f"- {item.quantity * scaling_factor} {item.ingredient.unit} {item.ingredient}"
@@ -209,6 +209,8 @@ class Project(BaseModel):
     """Multiple dishes for a certain number of servings"""
 
     name = peewee.CharField(unique=True)
+
+    _list_fields = ["id", "name", ("items", len)]
 
     def __str__(self) -> str:
         return f"{self.name}: {funcy.ilen(self.items)} recipes"
@@ -333,15 +335,7 @@ class Project(BaseModel):
             t.add_row(row)
         print(t.get_csv_string())
 
-    def print_scaled(self):
-        print(self)
-        print()
-        for recipe in self.recipes:
-            print(f"{recipe}")
-            for item in recipe.items:
-                print(
-                    f"- {item.quantity * self.servings / recipe.serves} {item.ingredient.unit} {item.ingredient}"
-                )
+    def compute(self): ...
 
 
 class ProjectRecipe(BaseModel):
