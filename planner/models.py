@@ -176,7 +176,10 @@ class Recipe(BaseModel):
 
     @funcy.joining("\n")
     def as_text(self, servings=None):
-        scaling_factor = 1
+        if servings is not None:
+            scaling_factor = servings / self.serves
+        else:
+            scaling_factor = 1
         yield f"serves: {self.serves}"
         yield "---"
         for item in self.items:
