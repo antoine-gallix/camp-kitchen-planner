@@ -174,17 +174,16 @@ class Recipe(BaseModel):
     def exists(cls, name) -> bool:
         return cls.get_or_none(cls.name == name) is not None
 
-    def as_text(self):
-        lines = []
-        lines.append(f"serves: {self.serves}")
-        lines.append("---")
+    @funcy.joining("\n")
+    def as_text(self, servings=None):
+        scaling_factor = 1
+        yield f"serves: {self.serves}"
+        yield "---"
         for item in self.items:
-            lines.append(f"- {item.quantity} {item.ingredient.unit} {item.ingredient}")
+            yield f"- {item.quantity * scaling_factor} {item.ingredient.unit} {item.ingredient}"
         if self.instructions is not None:
-            lines.append("---")
-            lines.append(self.instructions)
-
-        return "\n".join(lines)
+            yield "---"
+            yield self.instructions
 
 
 class IngredientQuantity(BaseModel):
