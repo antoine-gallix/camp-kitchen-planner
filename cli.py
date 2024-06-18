@@ -216,7 +216,7 @@ def create_project(name):
 
 @project.command("list")
 def list_projects() -> None:
-    explore.print_instances(models.Project)
+    explore.print_instances_table(models.Project)
 
 
 @project.command("show")
