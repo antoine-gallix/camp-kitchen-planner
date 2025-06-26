@@ -2,7 +2,7 @@
 name = "camp-kitchen-planner"
 version = "0.1.0"
 description = ""
-authors = [{ name = "Antoine Gallix", email = "antoine.gallix@a2ei.org" }]
+authors = [{ name = "Antoine Gallix", email = "antoine.gallix@protonmail.com" }]
 requires-python = ">=3.12,<4.0"
 readme = "README.md"
 dependencies = [
