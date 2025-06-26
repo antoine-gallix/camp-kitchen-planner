@@ -1,31 +1,36 @@
-[tool.poetry]
+[project]
 name = "camp-kitchen-planner"
 version = "0.1.0"
 description = ""
-authors = ["Antoine Gallix <antoine.gallix@a2ei.org>"]
+authors = [{ name = "Antoine Gallix", email = "antoine.gallix@a2ei.org" }]
+requires-python = ">=3.12,<4.0"
 readme = "README.md"
-packages = [{ include = "planner" }]
+dependencies = [
+    "peewee>=3.16.2,<4",
+    "prettytable>=3.8.0,<4",
+    "dynaconf>=3.1.12,<4",
+    "loguru>=0.7.0,<0.8",
+    "python-statemachine>=2.1.0,<3",
+    "pyyaml~=6.0",
+    "funcy~=2.0",
+    "pytest>=7.3.2,<8",
+    "rich>=13.7.1,<14",
+    "click>=8.1.7,<9",
+    "textual>=0.66.0,<0.67",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.12,<4.0"
-peewee = "^3.16.2"
-prettytable = "^3.8.0"
-dynaconf = "^3.1.12"
-loguru = "^0.7.0"
-python-statemachine = "^2.1.0"
-pyyaml = "^6.0"
-funcy = "^2.0"
-pytest = "^7.3.2"
-rich = "^13.7.1"
-click = "^8.1.7"
-textual = "^0.66.0"
-
-[tool.poetry.scripts]
+[project.scripts]
 planner = "cli:main"
 
+[tool.hatch.build.targets.sdist]
+include = ["planner"]
+
+[tool.hatch.build.targets.wheel]
+include = ["planner"]
+
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 filterwarnings = [
