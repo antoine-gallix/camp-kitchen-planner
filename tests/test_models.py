@@ -291,8 +291,8 @@ def test__Recipe__full__no_instructions(pan_con_tomate):
     assert pan_con_tomate.as_text().split("\n") == [
         "serves: 1",
         "---",
-        "- 0.1 kilogram tomate",
-        "- 1.0 unit pan",
+        "- 0.100 kilogram tomate",
+        "- 1.000 unit pan",
     ]
 
 
@@ -301,8 +301,8 @@ def test__Recipe__full__with_instructions(pan_con_tomate):
     assert pan_con_tomate.as_text().split("\n") == [
         "serves: 1",
         "---",
-        "- 0.1 kilogram tomate",
-        "- 1.0 unit pan",
+        "- 0.100 kilogram tomate",
+        "- 1.000 unit pan",
         "---",
         "grate the tomate",
         "put on top of the bread",

@@ -183,7 +183,7 @@ class Recipe(BaseModel):
         yield f"serves: {self.serves * scaling_factor}"
         yield "---"
         for item in self.items:
-            yield f"- {item.quantity * scaling_factor:.2f} {item.ingredient.unit} {item.ingredient}"
+            yield f"- {item.quantity * scaling_factor:.3f} {item.ingredient.unit} {item.ingredient}"
         if self.instructions is not None:
             yield "---"
             yield self.instructions
