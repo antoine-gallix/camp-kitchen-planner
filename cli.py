@@ -11,7 +11,7 @@ from rich.console import Console
 from rich.text import Text
 from yaml import Loader, load_all
 
-from planner import app, config, explore, models
+from planner import config, explore, models
 from planner.database import DB
 from planner.errors import ParsingError
 
@@ -41,9 +41,6 @@ def db_summary() -> None:
         print(f"{model.__name__} : {explore.count_instances(model)}")
 
 
-@main.command("UI")
-def start_ui() -> None:
-    app.MyApp().run()
 
 
 # ------------------------- database -------------------------
