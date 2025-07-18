@@ -13,6 +13,7 @@ from planner.logging import logger
 
 def normalize_string(string):
     return re.sub("\s{2,}", " ", string.lower().strip())
+    """Reduce multiple whitespaces to one"""
 
 
 # ------------------------- recipe item -------------------------
