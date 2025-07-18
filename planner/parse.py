@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import Any, Self
 
 import funcy
-import yaml
 
+from planner.io import load_yaml
 from planner.errors import ParsingError
 from planner.logging import logger
 
@@ -160,9 +160,6 @@ def _split_recipe_file(
     except IndexError:
         instructions = None
     return name, header, items, instructions
-
-
-load_yaml = funcy.partial(yaml.load, Loader=yaml.Loader)
 
 
 def parse_recipe_file(
