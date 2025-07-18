@@ -12,8 +12,8 @@ from planner.logging import logger
 
 
 def normalize_string(string):
-    return re.sub("\s{2,}", " ", string.lower().strip())
     """Reduce multiple whitespaces to one"""
+    return re.sub(r"\s{2,}", " ", string.lower().strip())
 
 
 # ------------------------- recipe item -------------------------
