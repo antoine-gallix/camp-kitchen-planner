@@ -11,9 +11,11 @@ from rich.console import Console
 from rich.text import Text
 from yaml import Loader, load_all
 
-from planner import config, explore, models
+from planner import config, explore, models, logger
 from planner.database import DB
 from planner.errors import ParsingError
+from planner.io import load_all_yaml_from_file
+from planner.models import Ingredient
 
 
 def print_success(text):
@@ -39,8 +41,6 @@ def config_() -> None:
 def db_summary() -> None:
     for model in [models.Project, models.Recipe, models.Ingredient, models.Tag]:
         print(f"{model.__name__} : {explore.count_instances(model)}")
-
-
 
 
 # ------------------------- database -------------------------
@@ -104,7 +104,7 @@ def update_tags_from_file(file, create_tags) -> None:
             for tag in (tags[tag_name] for tag_name in update_item["tags"]):
                 ingredient.add_tag(tag)
         except peewee.DoesNotExist:
-            print_error(f"could not find ingredient: {update_item["name"]}")
+            print_error(f"could not find ingredient: {update_item['name']}")
 
 
 # ------------------------- ingredient -------------------------
@@ -131,6 +131,24 @@ def dump_ingredients(file) -> None:
     print(f"writing ingredients in {file!r}")
     serialized = [ingredient.dump() for ingredient in models.Ingredient.select()]
     yaml.dump_all(serialized, Path(file).open("w"))
+
+
+@ingredient.command("import")
+@click.argument("file", type=click.Path(readable=True))
+def import_ingredients(file) -> None:
+    logger.info(f"importing ingredients from {file}")
+    ingredient_data = load_all_yaml_from_file(file)
+    ingredients = [
+        Ingredient(**funcy.project(data, keys=("name", "unit")))
+        for data in ingredient_data
+    ]
+    logger.info(f"{len(ingredients)} ingredients extracted")
+    for ingredient in ingredients:
+        try:
+            ingredient.save()
+            logger.debug(f"ingredient inserted: {ingredient}")
+        except peewee.IntegrityError:
+            logger.warning(f"ingredient insertion failed: {ingredient}")
 
 
 # ------------------------- recipe -------------------------
