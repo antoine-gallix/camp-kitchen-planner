@@ -1,4 +1,5 @@
 """Database query and presentation"""
+
 import peewee
 from rich import print
 from rich.table import Table
@@ -19,7 +20,7 @@ def print_instances(model):
         print(f"- {instance}")
 
 
-def access_field(instance, accessor):
+def _access_field(instance, accessor):
     match accessor:
         case str(attribute):
             return getattr(instance, attribute)
@@ -27,7 +28,7 @@ def access_field(instance, accessor):
             return function(getattr(instance, attribute))
 
 
-def field_as_string(field):
+def _field_as_string(field):
     if isinstance(field, list):
         if field:
             return str([str(item) for item in field])
@@ -43,6 +44,7 @@ def print_instances_table(model):
     if not instances:
         print(f"no {model.__name__} in the database")
         return
+
     table = Table(title=model.__name__)
     try:
         field_accessor_specs = getattr(model, "_list_fields")
@@ -56,9 +58,9 @@ def print_instances_table(model):
                 table.add_column(f"{function.__name__}({name})")
     for instance in instances:
         instance_fields = (
-            access_field(instance, field_accessor_spec)
+            _access_field(instance, field_accessor_spec)
             for field_accessor_spec in field_accessor_specs
         )
 
-        table.add_row(*tuple(field_as_string(field) for field in instance_fields))
+        table.add_row(*tuple(_field_as_string(field) for field in instance_fields))
     print(table)
