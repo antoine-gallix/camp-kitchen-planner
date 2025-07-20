@@ -20,7 +20,7 @@ dependencies = [
 ]
 
 [project.scripts]
-planner = "cli:main"
+planner = "cli.cli:main"
 
 [tool.hatch.build.targets.sdist]
 include = ["planner"]
