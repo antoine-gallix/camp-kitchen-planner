@@ -11,11 +11,12 @@ from rich.console import Console
 from rich.text import Text
 from yaml import Loader, load_all
 
-from planner import config, explore, models, logger
+from planner import config, models, logger
 from planner.database import DB
 from planner.errors import ParsingError
 from planner.io import load_all_yaml_from_file
 from planner.models import Ingredient
+from . import ingredient_list_app, explore
 
 
 def print_success(text):
@@ -115,7 +116,8 @@ main.add_command(ingredient)
 
 @ingredient.command("list")
 def list_ingredient() -> None:
-    explore.print_instances_table(models.Ingredient)
+    list_app = ingredient_list_app.IngredientsVisualizer(models.Ingredient.select())
+    list_app.run()
 
 
 @ingredient.command("show")
