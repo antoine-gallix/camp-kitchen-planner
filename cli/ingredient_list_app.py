@@ -6,15 +6,7 @@ from textual.containers import Container
 class IngredientsVisualizer(App):
     """A simple TUI app to display ingredients in a table."""
 
-    CSS = """
-    DataTable {
-        height: 1fr;
-    }
-    
-    Container {
-        padding: 1;
-    }
-    """
+    CSS_PATH = """./app.tcss"""
 
     def __init__(self, ingredients):
         super().__init__()
