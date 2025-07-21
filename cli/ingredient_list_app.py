@@ -1,5 +1,5 @@
 from textual.app import App, ComposeResult
-from textual.widgets import DataTable, Header, Footer
+from textual.widgets import DataTable, Header, Footer, Input
 from textual.containers import Container
 
 
@@ -15,6 +15,7 @@ class IngredientsVisualizer(App):
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""
         yield Header()
+        yield Input(placeholder="name", id="filter-input")
         with Container():
             yield DataTable(id="ingredients-table")
         yield Footer()
@@ -29,6 +30,27 @@ class IngredientsVisualizer(App):
         # Configure table for row-by-row navigation
         table.cursor_type = "row"
 
-        # Add rows from ingredients data
-        for ingredient in self.ingredients:
+        self.update_table("")
+
+    def update_table(self, filter_text: str) -> None:
+        """Update table content based on filter."""
+        table = self.query_one("#ingredients-table", DataTable)
+
+        # Clear existing rows
+        table.clear()
+
+        # Filter ingredients by name (case-insensitive)
+        filtered_ingredients = [
+            ingredient
+            for ingredient in self.ingredients
+            if filter_text.lower() in ingredient.name.lower()
+        ]
+
+        # Add filtered rows
+        for ingredient in filtered_ingredients:
             table.add_row(ingredient.name, ingredient.unit)
+
+    def on_input_changed(self, event: Input.Changed) -> None:
+        """Handle input changes for filtering."""
+        if event.input.id == "filter-input":
+            self.update_table(event.value)
