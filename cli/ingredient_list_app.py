@@ -1,5 +1,5 @@
 from textual.app import App, ComposeResult
-from textual.widgets import DataTable, Header, Footer, Input
+from textual.widgets import DataTable, Header, Footer, Input, Static
 from textual.containers import Container
 
 
@@ -15,6 +15,7 @@ class IngredientsVisualizer(App):
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""
         yield Header()
+        yield Static(id="count-display")
         yield Input(placeholder="name", id="filter-input")
         with Container():
             yield DataTable(id="ingredients-table")
@@ -49,6 +50,17 @@ class IngredientsVisualizer(App):
         # Add filtered rows
         for ingredient in filtered_ingredients:
             table.add_row(ingredient.name, ingredient.unit)
+
+        # Update count display
+        count_display = self.query_one("#count-display")
+
+        total_count = len(self.ingredients)
+        filtered_count = len(filtered_ingredients)
+
+        if filter_text:
+            count_display.update(f"{filtered_count}/{total_count} ingredients")
+        else:
+            count_display.update(f"{total_count} ingredients")
 
     def on_input_changed(self, event: Input.Changed) -> None:
         """Handle input changes for filtering."""
