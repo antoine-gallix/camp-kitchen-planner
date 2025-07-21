@@ -5,3 +5,9 @@ DataTable {
 Container {
     padding: 1;
 }
+
+#count-display {
+    border: round white;
+    margin-bottom: 1;
+    text-align
+}
